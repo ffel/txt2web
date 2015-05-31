@@ -7,14 +7,15 @@ import (
 )
 
 type Header struct {
-	Header string
-	Key    string
-	Path   string
+	Header      string
+	HeaderLevel int
+	Key         string
+	Path        string
 }
 
 // String prints Header
 func (h Header) String() string {
-	return fmt.Sprintf("%s (%s, %s)", h.Header, h.Key, h.Path)
+	return fmt.Sprintf("* %s (%s, %s)", h.Header, h.Key, h.Path)
 }
 
 // Walk start recursive iteration over sub dir tree
