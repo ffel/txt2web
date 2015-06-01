@@ -20,8 +20,8 @@ func (h Header) String() string {
 }
 
 // Walk start recursive iteration over sub dir tree
-func Walk(path string) {
-	for _, h := range Headers(path) {
+func Walk(root, path string) {
+	for _, h := range Headers(root, path) {
 		c, err := Contents(h)
 
 		if err != nil {
@@ -32,12 +32,12 @@ func Walk(path string) {
 	}
 
 	for _, s := range SubDirs(path) {
-		Walk(s)
+		Walk(root, s)
 	}
 }
 
 // Headers gets all headers in path
-func Headers(path string) []Header {
+func Headers(root, path string) []Header {
 	files, err := ioutil.ReadDir(path)
 
 	result := make([]Header, 0)
@@ -48,7 +48,7 @@ func Headers(path string) []Header {
 
 	for _, f := range files {
 		if f.Mode().IsRegular() && filepath.Ext(f.Name()) == ".txt" {
-			result = append(result, collectheaders(filepath.Join(path, f.Name()))...)
+			result = append(result, collectheaders(root, filepath.Join(path, f.Name()))...)
 		}
 	}
 

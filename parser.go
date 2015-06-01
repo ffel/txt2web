@@ -3,6 +3,8 @@ package txt2web
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
+	"path/filepath"
 
 	"github.com/ffel/pandocfilter"
 	"github.com/ffel/piperunner"
@@ -13,7 +15,7 @@ func init() {
 	piperunner.StartPool()
 }
 
-func collectheaders(file string) []Header {
+func collectheaders(root, file string) []Header {
 	result := make([]Header, 0)
 	jsondata, err := getJson(file)
 
@@ -21,7 +23,15 @@ func collectheaders(file string) []Header {
 		return result
 	}
 
-	f := &pdtoc{file: file, headers: make([]Header, 0)}
+	// remove root from file
+	rel, err := filepath.Rel(root, file)
+
+	if err != nil {
+		log.Println(root, file, err)
+		return result
+	}
+
+	f := &pdtoc{file: rel, headers: make([]Header, 0)}
 
 	pandocfilter.Walk(f, jsondata)
 
