@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strings"
 
 	"github.com/ffel/pandocfilter"
 	"github.com/ffel/piperunner"
@@ -15,6 +16,7 @@ func init() {
 	piperunner.StartPool()
 }
 
+// collectheaders opens file and collects info about all # headers
 func collectheaders(root, file string) []Header {
 	result := make([]Header, 0)
 	jsondata, err := getJson(file)
@@ -23,7 +25,7 @@ func collectheaders(root, file string) []Header {
 		return result
 	}
 
-	// remove root from file
+	// remove root from file (we don't want path to tree in the key)
 	rel, err := filepath.Rel(root, file)
 
 	if err != nil {
@@ -111,7 +113,7 @@ func (p *pdtoc) processHeader(json interface{}) (title, key string, level int) {
 
 	pandocfilter.Walk(col, label)
 
-	return col.value, ref, int(lev)
+	return strings.TrimSpace(col.value), ref, int(lev)
 }
 
 // collector walks the header c and collects the Str

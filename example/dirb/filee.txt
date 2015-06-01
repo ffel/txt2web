@@ -7,7 +7,7 @@ lectus eget, feugiat malesuada nisl. Donec a laoreet ante, in laoreet
 velit.
 
 Duis faucibus auctor tortor nec accumsan
-========================================
+----------------------------------------
 
 Vivamus erat quam, ultrices in aliquam vitae, dapibus non lacus.
 Phasellus gravida ligula urna, at congue dui vulputate vitae. Phasellus
@@ -16,7 +16,7 @@ malesuada justo euismod dapibus. Vivamus laoreet lacinia urna eget
 dapibus.
 
 Vivamus luctus maximus risus
-============================
+----------------------------
 
 sed tincidunt nisi fermentum ac. Proin suscipit bibendum odio, eu
 elementum massa auctor imperdiet. Curabitur erat urna, eleifend nec

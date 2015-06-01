@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strings"
 )
 
 // Header describes a <h1> chunk of html
@@ -17,18 +18,24 @@ type Header struct {
 
 // String prints Header
 func (h Header) String() string {
-	return fmt.Sprintf("* %s (%s, %s)", h.Header, h.Key, h.Path)
+	// you don't want the whitespace here
+	return fmt.Sprintf("[%s](%s)", h.Header, h.WebKey())
+}
+
+func (h Header) WebKey() string {
+	return fmt.Sprintf("#%s/%s", h.Path, h.Key)
 }
 
 // Walk start recursive iteration over sub dir tree
 func Walk(root, path string) {
 	for _, h := range Headers(root, path) {
-		c, err := Contents(h)
+		// printing c will be added later, or better, accept a function
+		_, err := Contents(h)
 
 		if err != nil {
 			log.Println(err)
 		} else {
-			fmt.Printf("%v:\n%s\n", h, c)
+			fmt.Printf("%s+ %v\n", strings.Repeat("  ", h.HeaderLevel-1), h)
 		}
 	}
 
