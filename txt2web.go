@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// Header describes a <h1> chunk of html
 type Header struct {
 	Header      string
 	HeaderLevel int
@@ -35,7 +36,7 @@ func Walk(path string) {
 	}
 }
 
-// Get all headers in path
+// Headers gets all headers in path
 func Headers(path string) []Header {
 	files, err := ioutil.ReadDir(path)
 
@@ -47,19 +48,19 @@ func Headers(path string) []Header {
 
 	for _, f := range files {
 		if f.Mode().IsRegular() && filepath.Ext(f.Name()) == ".txt" {
-			result = append(result, collectheaders(path+"/"+f.Name())...)
+			result = append(result, collectheaders(filepath.Join(path, f.Name()))...)
 		}
 	}
 
 	return result
 }
 
-// Get the contents of header
+// Contents gets the contents that goes with header
 func Contents(header Header) (string, error) {
 	return "", nil
 }
 
-// Get all sub directories in path such that these can be used in Headers()
+// SubDir gets all sub directories in path such that these can be used in Headers()
 func SubDirs(path string) []string {
 	files, err := ioutil.ReadDir(path)
 
@@ -71,7 +72,7 @@ func SubDirs(path string) []string {
 
 	for _, f := range files {
 		if f.IsDir() {
-			result = append(result, path+"/"+f.Name())
+			result = append(result, filepath.Join(path, f.Name()))
 		}
 	}
 
