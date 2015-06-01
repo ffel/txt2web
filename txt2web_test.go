@@ -1,10 +1,8 @@
 package txt2web
 
-// next challange: path names should go without argument path, that is, relative to
-// argument
-// see - http://godoc.org/path/filepath#example-Rel
-//
-// besides, use http://godoc.org/path/filepath#Join
+// next by then challange: replace references in json (maybe this is the first challenge)
+
+// next challenge: print toc with made up references.  (For what reason do we have to change "/", this is allowed in # directive)
 
 func Example() {
 	Walk("./example", "./example")

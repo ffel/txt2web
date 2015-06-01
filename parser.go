@@ -43,6 +43,7 @@ func getJson(file string) (interface{}, error) {
 	txt, err := ioutil.ReadFile(file)
 
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -51,6 +52,7 @@ func getJson(file string) (interface{}, error) {
 	result := <-resultc
 
 	if result.Err != nil {
+		log.Println(err)
 		return nil, result.Err
 	}
 
@@ -58,6 +60,7 @@ func getJson(file string) (interface{}, error) {
 	err = json.Unmarshal(result.Text, &jsondata)
 
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -86,18 +89,21 @@ func (p *pdtoc) processHeader(json interface{}) (title, key string, level int) {
 	lev, err := pandocfilter.GetNumber(json, "0")
 
 	if err != nil {
+		log.Println(err)
 		return "", "", 0
 	}
 
 	ref, err := pandocfilter.GetString(json, "1", "0")
 
 	if err != nil {
+		log.Println(err)
 		return "", "", 0
 	}
 
 	label, err := pandocfilter.GetObject(json, "2")
 
 	if err != nil {
+		log.Println(err)
 		return "", "", 0
 	}
 

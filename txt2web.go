@@ -3,6 +3,7 @@ package txt2web
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 )
 
@@ -25,7 +26,7 @@ func Walk(root, path string) {
 		c, err := Contents(h)
 
 		if err != nil {
-			fmt.Printf("error %v\n", err)
+			log.Println(err)
 		} else {
 			fmt.Printf("%v:\n%s\n", h, c)
 		}
@@ -43,6 +44,7 @@ func Headers(root, path string) []Header {
 	result := make([]Header, 0)
 
 	if err != nil {
+		log.Println(err)
 		return result
 	}
 
