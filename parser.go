@@ -22,6 +22,7 @@ func collectheaders(root, file string) []Header {
 	jsondata, err := getJson(file)
 
 	if err != nil {
+		log.Println(root, file, err)
 		return result
 	}
 

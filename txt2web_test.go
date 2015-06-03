@@ -1,8 +1,7 @@
 package txt2web
 
 // next by then challange: replace references in json (maybe this is the first challenge)
-
-// next challenge: print toc with made up references.  (For what reason do we have to change "/", this is allowed in # directive)
+// what to do with this json
 
 func Example() {
 	Walk("./example", "./example")
