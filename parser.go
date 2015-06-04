@@ -1,20 +1,12 @@
 package txt2web
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strings"
 
 	"github.com/ffel/pandocfilter"
-	"github.com/ffel/piperunner"
 )
-
-func init() {
-	// prepare a pool of pandoc runners in the background
-	piperunner.StartPool()
-}
 
 // collectheaders opens file and collects info about all # headers
 func collectheaders(root, file string) []Header {
@@ -39,35 +31,6 @@ func collectheaders(root, file string) []Header {
 	pandocfilter.Walk(f, jsondata)
 
 	return f.headers
-}
-
-// function getJson converts contents of file to pandoc json
-func getJson(file string) (interface{}, error) {
-	txt, err := ioutil.ReadFile(file)
-
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	resultc := piperunner.Exec("pandoc -f markdown -t json", txt)
-
-	result := <-resultc
-
-	if result.Err != nil {
-		log.Println(err)
-		return nil, result.Err
-	}
-
-	var jsondata interface{}
-	err = json.Unmarshal(result.Text, &jsondata)
-
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return jsondata, nil
 }
 
 // type pdtoc implements pandoc runner filter and retrieves headers
