@@ -10,13 +10,65 @@ import (
 // next is we need a process with two sub nodes, such that additional data is passed
 // first phase returns two channels, second phase expects two channels and returns one as usual
 
+// dit lijkt een beetje op doorgeven van de quit channel (maar dat is dat weer voor iedere node)
+
+// variadic return ... ? https://code.google.com/p/go/issues/detail?id=119
+
+/*
+fan-out, fan in
+---------------
+
+Een node kan een fan-out implementeren, dat is, de inkomende stroom
+wordt verdeeld over meerdere uitgaande stromen.
+
+Er zijn twee types denkbaar.
+
+In het eerste type bepaalt de node het aantal uitgaande stromen.
+Eventueel kan zo'n aantal bepaald worden door een aantal dat als
+argument wordt meegegeven. De node retourneert dan de uitgaande stromen.
+Dit moet als een slice. Mogelijk bestaat er een variadic return waarde.
+
+In het tweede type krijgt de node de beschikking over uitgaande stromen.
+Dat kan niet veel anders dan de uitgaande stromen als (variadic)
+argument krijgt. Dan is er vervolgens nog de optie dat deze variadic
+argument het is. Maar het is ook denkbaar dat de uitgaande stromen over
+de return waarden worden teruggegeven, net als in het eerste type.
+
+> Er is wat discussie rondom variadic return values, maar al met al
+> lijkt het er op dat het niet (meer) wordt ondersteund.
+
+Deze discussie is interessant, maar volgens mij niet zo interessant.
+*/
+
 func Example_pipeline() {
 	term(sq(sum(gen(1, 2, 3, 4, 5))))
+	fmt.Println("---")
+
+	term(odds_b(odds_a(gen(2, 4, 6))))
+	fmt.Println("---")
+	term(odds_b(odds_a(gen(1, 4, 6))))
+	fmt.Println("---")
+	term(odds_b(odds_a(gen(2, 4, 1))))
 
 	// output:
 	// 9
 	// 49
 	// 25
+	// ---
+	// 2
+	// 4
+	// channel did not contain odd value
+	// 6
+	// ---
+	// channel contains odd value
+	// 1
+	// 4
+	// 6
+	// ---
+	// 2
+	// 4
+	// channel contains odd value
+	// 1
 }
 
 // generator
@@ -55,7 +107,9 @@ func sum(in <-chan int) <-chan int {
 		for {
 			a, oka := <-in
 			b, okb := <-in
-			// with even numbers in the chan, oka will be false first
+			// with even #numbers in the chan, channel will be closed when it is a's
+			// turn to receive a value.  So, we have to check oka to prevent a spurious
+			// zero in the outbound channel
 			if oka {
 				out <- a + b
 			}
@@ -73,6 +127,54 @@ func sq(in <-chan int) <-chan int {
 	go func() {
 		for n := range in {
 			out <- n * n
+		}
+		close(out)
+	}()
+	return out
+}
+
+// odds_a is a silly first phase in a two step node.  Function odds_a
+// sends true over the bool channel whenever there is an odd value
+// in the inbound channel
+func odds_a(in <-chan int) (<-chan int, <-chan bool) {
+	out := make(chan int)
+	hasOdd := make(chan bool)
+	go func() {
+		noOdds := true
+		for n := range in {
+			// send exactly one value
+			if noOdds && n%2 == 1 {
+				noOdds = false
+				hasOdd <- true
+			}
+			out <- n
+		}
+		close(out)
+		// in case you close hasOdd, listeners will receive false values
+		// so, apparently no need to send false explicitly
+		if noOdds {
+			hasOdd <- false
+		}
+		close(hasOdd)
+	}()
+	return out, hasOdd
+}
+
+func odds_b(in <-chan int, hasOdd <-chan bool) <-chan int {
+	out := make(chan int)
+
+	go func() {
+		val := <-hasOdd
+		if val {
+			fmt.Println("channel contains odd value")
+		} else {
+			fmt.Println("channel did not contain odd value")
+		}
+	}()
+
+	go func() {
+		for n := range in {
+			out <- n
 		}
 		close(out)
 	}()
