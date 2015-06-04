@@ -42,6 +42,8 @@ Deze discussie is interessant, maar volgens mij niet zo interessant.
 
 func Example_pipeline() {
 	term(sq(sum(gen(1, 2, 3, 4, 5))))
+
+	fmt.Println("---")
 	fmt.Println("---")
 
 	term(odds_b(odds_a(gen(2, 4, 6))))
@@ -50,10 +52,36 @@ func Example_pipeline() {
 	fmt.Println("---")
 	term(odds_b(odds_a(gen(2, 4, 1))))
 
+	fmt.Println("---")
+	fmt.Println("---")
+
+	term(odds_c(odds_a(gen(2, 4, 6))))
+	fmt.Println("---")
+	term(odds_c(odds_a(gen(1, 4, 6))))
+	fmt.Println("---")
+	term(odds_c(odds_a(gen(2, 4, 1))))
+
 	// output:
 	// 9
 	// 49
 	// 25
+	// ---
+	// ---
+	// 2
+	// 4
+	// channel did not contain odd value
+	// 6
+	// ---
+	// channel contains odd value
+	// 1
+	// 4
+	// 6
+	// ---
+	// 2
+	// 4
+	// channel contains odd value
+	// 1
+	// ---
 	// ---
 	// 2
 	// 4
@@ -160,8 +188,19 @@ func odds_a(in <-chan int) (<-chan int, <-chan bool) {
 	return out, hasOdd
 }
 
+// odds_b is a 2nd step function that accepts odds_a as argument.
+// it is a little bit undeterministic in that "channel contains odd value"
+// come just before the 4.  (in some other attempts, there is no problem)
 func odds_b(in <-chan int, hasOdd <-chan bool) <-chan int {
 	out := make(chan int)
+
+	// odds_b has two closures, one for each channel.  odds_c uses one
+	// closure and a select.
+
+	// combine into one for select??
+	// a solution may be in http://stackoverflow.com/questions/13666253
+	// but find this a little bit clunky, esp. when I've to check for
+	// closed channels
 
 	go func() {
 		val := <-hasOdd
@@ -178,6 +217,45 @@ func odds_b(in <-chan int, hasOdd <-chan bool) <-chan int {
 		}
 		close(out)
 	}()
+	return out
+}
+
+// odds_c is an alternative for odds_b -  a 2nd step node function
+// I expect this version is a little bit more determistic.
+func odds_c(in <-chan int, hasOdd <-chan bool) <-chan int {
+	out := make(chan int)
+
+	// odds_c uses one closure and a select. odds_b has two closures,
+	// one for each channel.
+
+	// see  http://stackoverflow.com/questions/13666253
+
+	go func() {
+		for {
+			select {
+			case odd, odd_open := <-hasOdd:
+				if odd_open && odd {
+					fmt.Println("channel contains odd value")
+				} else if odd_open && !odd {
+					fmt.Println("channel did not contain odd value")
+				} else {
+					hasOdd = nil
+				}
+			case i, in_open := <-in:
+				if in_open {
+					out <- i
+				} else {
+					in = nil
+				}
+			}
+
+			if hasOdd == nil && in == nil {
+				break
+			}
+		}
+		close(out)
+	}()
+
 	return out
 }
 
