@@ -8,6 +8,32 @@ import (
 	"strings"
 )
 
+// Chunk is the basis data object for one #-section
+type Chunk struct {
+	Json     interface{} // internal representation of Json
+	Path     string      // file + path local to web root
+	Section  int         // nr of # section in file (0 is pre section text)
+	Title    string      // section title
+	PandocId string      // original key (either user or pandoc provided)
+}
+
+// Webkey is the chunk id that is used to refer between txt files
+func (c Chunk) Webkey() string {
+	// don't use Section in the key for this makes the key change
+	// when the order in the original text file changes, and that's too fragile
+	return fmt.Sprintf("#%s", filepath.Join(c.Path, c.PandocId))
+}
+
+// String produces the markdown link for Chunk
+func (c Chunk) String() string {
+	return fmt.Sprintf("[%s](%s)", c.Title, c.Webkey())
+}
+
+// txtRoot is relative or absolute path to root of txt2web project
+var txtRoot string
+
+////////////////////////////////////////////////////////////////////////////////
+
 // Header describes a <h1> chunk of html
 type Header struct {
 	Header      string
