@@ -3,6 +3,7 @@ package txt2web
 // next by then challange: replace references in json (maybe this is the first challenge)
 // what to do with this json
 
+/*
 func Example() {
 	Walk("./example", "./example")
 
@@ -20,3 +21,4 @@ func Example() {
 	// + [Vivamus eget cursus erat, in pharetra neque](#dirb/filee.txt/vivamus-eget-cursus-erat-in-pharetra-neque)
 	// + [Phasellus lorem eros](#dirb/filee.txt/phasellus-lorem-eros)
 }
+*/

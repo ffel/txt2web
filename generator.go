@@ -13,11 +13,6 @@ import (
 	"github.com/ffel/piperunner"
 )
 
-func init() {
-	// prepare a pool of pandoc runners in the background
-	piperunner.StartPool()
-}
-
 // Generate is the chunk generator, one Chunk will contain one
 // entire file at this point.
 func Generate(filenames <-chan string) <-chan Chunk {

@@ -1,12 +1,7 @@
 package txt2web
 
-import (
-	"log"
-	"path/filepath"
-	"strings"
-
-	"github.com/ffel/pandocfilter"
-)
+/*
+///////////////////////////////////////////////////////////////////////////
 
 // collectheaders opens file and collects info about all # headers
 func collectheaders(root, file string) []Header {
@@ -94,3 +89,4 @@ func (coll *collector) Value(level int, key string, value interface{}) (bool, in
 
 	return true, value
 }
+*/

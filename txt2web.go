@@ -2,11 +2,16 @@ package txt2web
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"path/filepath"
-	"strings"
+
+	"github.com/ffel/piperunner"
 )
+
+// init starts the pool of pipe runners which is the worker pool of
+// pandoc processes
+func init() {
+	piperunner.StartPool()
+}
 
 // Chunk is the basis data object for one #-section
 type Chunk struct {
@@ -52,6 +57,7 @@ func (h Header) WebKey() string {
 	return fmt.Sprintf("#%s/%s", h.Path, h.Key)
 }
 
+/*
 // Walk start recursive iteration over sub dir tree
 func Walk(root, path string) {
 	for _, h := range Headers(root, path) {
@@ -113,3 +119,4 @@ func SubDirs(path string) []string {
 
 	return result
 }
+*/
