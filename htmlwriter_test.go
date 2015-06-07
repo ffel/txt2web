@@ -1,20 +1,17 @@
 package txt2web
 
-import "time"
+import "fmt"
 
 func ExampleWriteHtml() {
 	txtRoot = "example"
-	WriteHtml(Generate(namegen("fileb.txt")))
+	destinations := WriteHtml(Generate(namegen("fileb.txt")))
 
-	// there is a slight problem with this test.  WriteHtml uses
-	// goroutines to print, but, WriteHtml is already terminated by then.
-	// This makes that another test receives the output.
-
-	// give the goroutives some time to terminate
-	time.Sleep(time.Second)
+	for d := range destinations {
+		fmt.Printf("-- %s:\n%s\n", d.Path, d.Contents)
+	}
 
 	// output:
-	// fileb.txt:
+	// -- fileb.txt:
 	// Pellentesque lobortis lacus
 	// ===========================
 	//
