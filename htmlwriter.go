@@ -48,7 +48,7 @@ func WriteHtml(in <-chan Chunk) <-chan Destination {
 				// wrapped = append(wrapped, bytes...)
 				// wrapped = append(wrapped, []byte("]")...)
 
-				resultc := piperunner.Exec("pandoc -f json -t markdown", bytes)
+				resultc := piperunner.Exec("pandoc -f json -t html", bytes)
 
 				result := <-resultc
 
