@@ -13,6 +13,9 @@ import (
 
 // run - go run t2w.go -src=../../example/ -dest=../../static
 
+// pages subdirectory
+const pages = "pages"
+
 func main() {
 	var src string
 	var dest string
@@ -26,7 +29,7 @@ func main() {
 
 	for h := range htmlc {
 		// create deep directory
-		err := os.MkdirAll(filepath.Join(dest, filepath.Dir(h.Path)), 0755)
+		err := os.MkdirAll(filepath.Join(dest, pages, filepath.Dir(h.Path)), 0755)
 
 		if err != nil {
 			log.Println(err)
@@ -37,7 +40,7 @@ func main() {
 		path := strings.TrimSuffix(h.Path, filepath.Ext(h.Path)) + ".html"
 
 		// write file
-		err = ioutil.WriteFile(filepath.Join(dest, path), h.Contents, 0644)
+		err = ioutil.WriteFile(filepath.Join(dest, pages, path), h.Contents, 0644)
 
 		if err != nil {
 			log.Println(err)

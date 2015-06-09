@@ -3,7 +3,7 @@ package txt2web
 import "fmt"
 
 func ExampleRun() {
-	runterm(Run("example"))
+	runterm(TxtFiles("example"))
 	// output:
 	// filea.txt
 	// fileb.txt

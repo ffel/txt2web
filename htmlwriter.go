@@ -11,20 +11,14 @@ import (
 	"github.com/ffel/piperunner"
 )
 
-// Destination is the contents and the file to write
-type Destination struct {
-	Contents []byte
-	Path     string
-}
-
-// WriteHtml writes Chunks to Destination
-func WriteHtml(in <-chan Chunk) <-chan Destination {
-	destination := make(chan Destination)
+// WriteHtml writes Chunks to HtmlFile
+func WriteHtml(in <-chan Chunk) <-chan HtmlFile {
+	htmlfilec := make(chan HtmlFile)
 	// we need a waitgroup to make sure that the innen goroutine
 	// of the very last item that is received on "in" completes
-	// before the "destination" channel is closed.
+	// before the "htmlfilec" channel is closed.
 	// In case we do not, the last result is never send on
-	// the destination channel because destination is closed too
+	// the htmlfilec channel because htmlfilec is closed too
 	// early (namely immediately after the last inner goroutine has
 	// started)
 	//
@@ -57,14 +51,14 @@ func WriteHtml(in <-chan Chunk) <-chan Destination {
 					return
 				}
 
-				destination <- Destination{Path: chunk.Path, Contents: result.Text}
+				htmlfilec <- HtmlFile{Path: chunk.Path, Contents: result.Text}
 
 			}()
 		}
 
 		wg.Wait()
-		close(destination)
+		close(htmlfilec)
 	}()
 
-	return destination
+	return htmlfilec
 }

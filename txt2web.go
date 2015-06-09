@@ -37,6 +37,18 @@ func (c Chunk) String() string {
 // txtRoot is relative or absolute path to root of txt2web project
 var txtRoot string
 
+// HtmlFile is the contents and the file to write
+type HtmlFile struct {
+	Contents []byte
+	Path     string
+}
+
+// Convert does the complete txt2web conversion
+func Convert(path string) <-chan HtmlFile {
+	// this creates the entire pipeline
+	return WriteHtml(Generate(TxtFiles(path)))
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // Header describes a <h1> chunk of html
@@ -53,6 +65,7 @@ func (h Header) String() string {
 	return fmt.Sprintf("[%s](%s)", h.Header, h.WebKey())
 }
 
+// WebKey creates the inter txt file web key
 func (h Header) WebKey() string {
 	return fmt.Sprintf("#%s/%s", h.Path, h.Key)
 }

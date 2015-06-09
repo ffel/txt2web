@@ -12,8 +12,8 @@ import (
 // not for now, so no need to store path to web root and target
 // path with every file
 
-// Run starts processing text files
-func Run(root string) <-chan string {
+// TxtFiles starts processing text files
+func TxtFiles(root string) <-chan string {
 	txtRoot = root
 	filenames := make(chan string)
 	go func() {
