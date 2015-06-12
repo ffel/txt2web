@@ -28,6 +28,7 @@ func main() {
 	htmlc := txt2web.Convert(src)
 
 	for h := range htmlc {
+
 		// create deep directory
 		err := os.MkdirAll(filepath.Join(dest, pages, filepath.Dir(h.Path)), 0755)
 

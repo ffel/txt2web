@@ -13,24 +13,25 @@ import (
 
 // WriteHtml writes Chunks to HtmlFile
 func WriteHtml(in <-chan Chunk) <-chan HtmlFile {
+
 	htmlfilec := make(chan HtmlFile)
-	// we need a waitgroup to make sure that the innen goroutine
-	// of the very last item that is received on "in" completes
-	// before the "htmlfilec" channel is closed.
-	// In case we do not, the last result is never send on
-	// the htmlfilec channel because htmlfilec is closed too
-	// early (namely immediately after the last inner goroutine has
-	// started)
-	//
-	// however, see http://nathanleclaire.com/blog/2014/02/15/how-to-wait-for-all-goroutines-to-finish-executing-before-continuing/
-	var wg sync.WaitGroup
+
 	go func() {
+
+		// we need a waitgroup to assure that `htmlfilec` is closed
+		// only after all inner go routines have been closed.
+
+		var wg sync.WaitGroup
+
 		for chunk := range in {
 			wg.Add(1)
 			// use a closure here to prevent blocking
-			go func() {
+
+			// this inner closure needs to receive chunk as an argument
+			// to prevent race conditions due to the typical closure issue...
+			go func(c Chunk) {
 				defer wg.Done()
-				bytes, err := json.Marshal(chunk.Json)
+				bytes, err := json.Marshal(c.Json)
 
 				if err != nil {
 					log.Println(err)
@@ -51,9 +52,9 @@ func WriteHtml(in <-chan Chunk) <-chan HtmlFile {
 					return
 				}
 
-				htmlfilec <- HtmlFile{Path: chunk.Path, Contents: result.Text}
+				htmlfilec <- HtmlFile{Path: c.Path, Contents: result.Text}
 
-			}()
+			}(chunk)
 		}
 
 		wg.Wait()
