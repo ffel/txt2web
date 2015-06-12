@@ -11,7 +11,7 @@ import (
 	"github.com/ffel/txt2web"
 )
 
-// run - go run t2w.go -src=../../example/ -dest=../../static
+// run - go run t2w.go -src=../../example/ -dest=../../example/static
 
 // pages subdirectory
 const pages = "pages"
@@ -25,7 +25,7 @@ func main() {
 
 	flag.Parse()
 
-	htmlc := txt2web.Convert(src)
+	htmlc := txt2web.Convert(src, dest)
 
 	for h := range htmlc {
 

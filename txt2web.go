@@ -36,6 +36,7 @@ func (c Chunk) String() string {
 
 // txtRoot is relative or absolute path to root of txt2web project
 var txtRoot string
+var destination string
 
 // HtmlFile is the contents and the file to write
 type HtmlFile struct {
@@ -44,9 +45,9 @@ type HtmlFile struct {
 }
 
 // Convert does the complete txt2web conversion
-func Convert(path string) <-chan HtmlFile {
+func Convert(txtroot, destination string) <-chan HtmlFile {
 	// this creates the entire pipeline
-	return WriteHtml(Generate(TxtFiles(path)))
+	return WriteHtml(Generate(TxtFiles(txtroot, destination)))
 }
 
 ////////////////////////////////////////////////////////////////////////////////

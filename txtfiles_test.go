@@ -3,7 +3,8 @@ package txt2web
 import "fmt"
 
 func ExampleRun() {
-	runterm(TxtFiles("example"))
+	// this test fails if example/static exists ...
+	runterm(TxtFiles("example", "example/static"))
 	// output:
 	// filea.txt
 	// fileb.txt
