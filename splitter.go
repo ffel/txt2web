@@ -44,7 +44,7 @@ func wrapSection(in interface{}) interface{} {
 
 	return []interface{}{
 		struct {
-			unMeta interface{}
+			UnMeta interface{}
 		}{},
 		in,
 	}

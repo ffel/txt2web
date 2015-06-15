@@ -1,24 +1,38 @@
 package txt2web
 
-// next by then challange: replace references in json (maybe this is the first challenge)
-// what to do with this json
+import (
+	"encoding/json"
+	"fmt"
+)
 
-/*
 func Example() {
-	Walk("./example", "./example")
+	outc := Convert("example/dira", "static")
+
+	// something wrong in wrapper I guess ...
+
+	for f := range outc {
+		fmt.Println("%v -- %v\n", f.Path, string(f.Contents))
+	}
 
 	// output:
-	// + [Lorem ipsum dolor sit amet](#filea.txt/lorem-ipsum-dolor-sit-amet)
-	// + [Morbi finibus rutrum condimentum.](#filea.txt/morbi-finibus-rutrum-condimentum.)
-	// + [Pellentesque lobortis lacus](#fileb.txt/pellentesque-lobortis-lacus)
-	// + [Nulla euismod placerat nunc at mattis](#dira/filec.txt/nulla-euismod-placerat-nunc-at-mattis)
-	// + [Donec lacus leo](#dira/filec.txt/donec-lacus-leo)
-	// + [Fusce non aliquet tortor.](#dira/filed.txt/fusce-non-aliquet-tortor.)
-	// + [Nulla ut faucibus felis](#dira/filed.txt/nulla-ut-faucibus-felis)
-	// + [Pellentesque lacinia](#dirb/filee.txt/pellentesque-lacinia)
-	//   + [Duis faucibus auctor tortor nec accumsan](#dirb/filee.txt/duis-faucibus-auctor-tortor-nec-accumsan)
-	//   + [Vivamus luctus maximus risus](#dirb/filee.txt/vivamus-luctus-maximus-risus)
-	// + [Vivamus eget cursus erat, in pharetra neque](#dirb/filee.txt/vivamus-eget-cursus-erat-in-pharetra-neque)
-	// + [Phasellus lorem eros](#dirb/filee.txt/phasellus-lorem-eros)
+	// boo
 }
-*/
+
+func Example_1() {
+	txtRoot = "example/dirb"
+	destination = "static"
+	outc := Split(Generate(TxtFiles(txtRoot, destination)))
+
+	for c := range outc {
+		bytes, err := json.Marshal(c.Json)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(string(bytes))
+		}
+	}
+
+	// output:
+	// baz
+}
