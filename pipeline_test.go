@@ -61,7 +61,8 @@ func Example_pipeline() {
 	fmt.Println("---")
 	term(odds_c(odds_a(gen(2, 4, 1))))
 
-	// output:
+	// `go test -race` mentions race conditions, for now, do not test:
+	// o u t p u t:
 	// 9
 	// 49
 	// 25

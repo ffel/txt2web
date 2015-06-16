@@ -41,6 +41,7 @@ var destination string
 // HtmlFile is the contents and the file to write
 type HtmlFile struct {
 	Contents []byte
+	Title    string
 	Path     string
 }
 

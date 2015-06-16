@@ -47,7 +47,7 @@ func WriteHtml(in <-chan Chunk) <-chan HtmlFile {
 					return
 				}
 
-				htmlfilec <- HtmlFile{Path: c.Path, Contents: result.Text}
+				htmlfilec <- HtmlFile{Path: c.Path, Title: c.Title, Contents: result.Text}
 
 			}(chunk)
 		}
