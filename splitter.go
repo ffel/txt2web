@@ -36,7 +36,7 @@ func Split(in <-chan Chunk) <-chan Chunk {
 }
 
 // wrapSection makes piece of json valid pandoc json again
-// it essentially adds an empty yaml header
+// it essentially adds the file yaml header in every section
 func wrapSection(meta, content interface{}) interface{} {
 
 	// use an anonymous struct
@@ -101,22 +101,12 @@ func (s sectiondata) String() string {
 
 // section splits one chunk into sections
 type section struct {
-	sections []sectiondata // the collection of sections
-
-	meta interface{} // meta data
-	// parsing bool        // true if visited the very first section
+	sections []sectiondata // the collection of sections in a file
+	meta     interface{}   // file meta data
 }
 
 func (sec *section) Value(level int, key string, value interface{}) (bool, interface{}) {
 
-	// among others: "++ 2 unMeta" (so, not a tc combi)
-	// fmt.Println("++", level, key)
-
-	// if key == "unMeta" {
-	// 	fmt.Printf("unmeta: %#v\n", value)
-	// }
-
-	// map[string]interface{}
 	ismeta, meta := isMeta(value)
 
 	if ismeta {
@@ -144,23 +134,11 @@ func (sec *section) Value(level int, key string, value interface{}) (bool, inter
 			}
 		}
 
-		// schijnbaar gaat dit niet goed - out-of-range
-		println(len(sec.sections), ok)
 		if ok {
-			//
 			current := sec.sections[len(sec.sections)-1]
 			current.contents = append(current.contents, value)
 			sec.sections[len(sec.sections)-1] = current
 		}
-
-		// if we're dealing with a section, that is, not in the text before
-		// the first section, we can append the value to current contents
-		// if sec.parsing {
-		// this is not going to work as you may get a new sec.current.contents
-		// which was never added to the original collection
-
-		// sec.current.contents = append(sec.current.contents, value)
-		// }
 
 		return false, value
 	}
@@ -188,8 +166,6 @@ func (sec *section) nextSection(header interface{}) {
 
 	pandocfilter.Walk(col, title)
 
-	// sec.parsing = true
-	// sec.current = sectiondata{id: id, title: strings.TrimSpace(col.value)}
 	sec.sections = append(sec.sections,
 		sectiondata{
 			id:    id,
@@ -198,7 +174,7 @@ func (sec *section) nextSection(header interface{}) {
 }
 
 // isMeta determines if value is the meta structure and returns the
-// complete meta set
+// complete meta set (including the "unMeta" tag)
 func isMeta(value interface{}) (bool, interface{}) {
 	set, isSet := value.(map[string]interface{})
 	if !isSet {
