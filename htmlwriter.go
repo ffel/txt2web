@@ -38,11 +38,6 @@ func WriteHtml(in <-chan Chunk) <-chan HtmlFile {
 					return
 				}
 
-				// as soon as we need wrapping:
-				// wrapped := []byte("[ { \"unMeta\" : {  } },")
-				// wrapped = append(wrapped, bytes...)
-				// wrapped = append(wrapped, []byte("]")...)
-
 				resultc := piperunner.Exec("pandoc -f json -t html", bytes)
 
 				result := <-resultc

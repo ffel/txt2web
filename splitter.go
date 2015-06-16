@@ -1,5 +1,9 @@
 package txt2web
 
+// the splitter is the node that is splits initial chunk that contain
+// the text in one file into separate one-section-per-chunk chunks.
+// each chunk gets the meta header of the original file.
+
 import (
 	"fmt"
 	"log"
@@ -14,13 +18,13 @@ func Split(in <-chan Chunk) <-chan Chunk {
 
 	go func() {
 		for c := range in {
-			sec := &section{}
+			spl := &splitter{}
 
-			pandocfilter.Walk(sec, c.Json)
+			pandocfilter.Walk(spl, c.Json)
 
-			for i, s := range sec.sections {
+			for i, s := range spl.sections {
 				out <- Chunk{
-					Json:     wrapSection(sec.meta, s.contents),
+					Json:     wrapSection(spl.meta, s.contents),
 					Path:     c.Path,
 					Section:  i + 1,
 					Title:    s.title,
@@ -99,18 +103,18 @@ func (s sectiondata) String() string {
 	return fmt.Sprintf("[%s](%s)", s.title, s.id)
 }
 
-// section splits one chunk into sections
-type section struct {
+// splitter splits one chunk into sections
+type splitter struct {
 	sections []sectiondata // the collection of sections in a file
 	meta     interface{}   // file meta data
 }
 
-func (sec *section) Value(level int, key string, value interface{}) (bool, interface{}) {
+func (spl *splitter) Value(level int, key string, value interface{}) (bool, interface{}) {
 
 	ismeta, meta := isMeta(value)
 
 	if ismeta {
-		sec.meta = meta
+		spl.meta = meta
 	}
 
 	// we can prevent deeper traversal through the tree by returning false
@@ -130,14 +134,14 @@ func (sec *section) Value(level int, key string, value interface{}) (bool, inter
 
 			// only interested in first order # sections
 			if secLevel == 1 {
-				sec.nextSection(c)
+				spl.nextSection(c)
 			}
 		}
 
 		if ok {
-			current := sec.sections[len(sec.sections)-1]
+			current := spl.sections[len(spl.sections)-1]
 			current.contents = append(current.contents, value)
-			sec.sections[len(sec.sections)-1] = current
+			spl.sections[len(spl.sections)-1] = current
 		}
 
 		return false, value
@@ -146,8 +150,8 @@ func (sec *section) Value(level int, key string, value interface{}) (bool, inter
 	return true, value
 }
 
-// nextSection prepares the and sets sec.current
-func (sec *section) nextSection(header interface{}) {
+// nextSection prepares the next section
+func (spl *splitter) nextSection(header interface{}) {
 	id, err := pandocfilter.GetString(header, "1", "0")
 
 	if err != nil {
@@ -166,7 +170,7 @@ func (sec *section) nextSection(header interface{}) {
 
 	pandocfilter.Walk(col, title)
 
-	sec.sections = append(sec.sections,
+	spl.sections = append(spl.sections,
 		sectiondata{
 			id:    id,
 			title: strings.TrimSpace(col.value),
