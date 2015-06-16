@@ -135,6 +135,8 @@ func (sec *section) Value(level int, key string, value interface{}) (bool, inter
 		// if we're dealing with a section, that is, not in the text before
 		// the first section, we can append the value to current contents
 		if sec.parsing {
+			// this is not going to work as you may get a new sec.current.contents
+			// which was never added to the original collection
 			sec.current.contents = append(sec.current.contents, value)
 		}
 
