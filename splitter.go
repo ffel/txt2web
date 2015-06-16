@@ -20,7 +20,7 @@ func Split(in <-chan Chunk) <-chan Chunk {
 
 			for i, s := range sec.sections {
 				out <- Chunk{
-					Json:     wrapSection(s.contents),
+					Json:     wrapSection(sec.meta, s.contents),
 					Path:     c.Path,
 					Section:  i + 1,
 					Title:    s.title,
@@ -37,7 +37,7 @@ func Split(in <-chan Chunk) <-chan Chunk {
 
 // wrapSection makes piece of json valid pandoc json again
 // it essentially adds an empty yaml header
-func wrapSection(in interface{}) interface{} {
+func wrapSection(meta, content interface{}) interface{} {
 
 	// use an anonymous struct
 	// see, e.g. https://talks.golang.org/2012/10things.slide#2
@@ -46,10 +46,8 @@ func wrapSection(in interface{}) interface{} {
 	// which makes it easier to get the `unMeta` correct (instead of `UnMeta`)
 
 	return []interface{}{
-		struct {
-			UnMeta interface{}
-		}{struct{}{}},
-		in,
+		meta,
+		content,
 	}
 }
 
@@ -105,10 +103,25 @@ func (s sectiondata) String() string {
 type section struct {
 	sections []sectiondata // the collection of sections
 
+	meta interface{} // meta data
 	// parsing bool        // true if visited the very first section
 }
 
 func (sec *section) Value(level int, key string, value interface{}) (bool, interface{}) {
+
+	// among others: "++ 2 unMeta" (so, not a tc combi)
+	// fmt.Println("++", level, key)
+
+	// if key == "unMeta" {
+	// 	fmt.Printf("unmeta: %#v\n", value)
+	// }
+
+	// map[string]interface{}
+	ismeta, meta := isMeta(value)
+
+	if ismeta {
+		sec.meta = meta
+	}
 
 	// we can prevent deeper traversal through the tree by returning false
 	// in case the level is 2
@@ -182,6 +195,25 @@ func (sec *section) nextSection(header interface{}) {
 			id:    id,
 			title: strings.TrimSpace(col.value),
 		})
+}
+
+// isMeta determines if value is the meta structure and returns the
+// complete meta set
+func isMeta(value interface{}) (bool, interface{}) {
+	set, isSet := value.(map[string]interface{})
+	if !isSet {
+		return false, nil
+	}
+	if len(set) != 1 {
+		return false, nil
+	}
+
+	_, ok := set["unMeta"]
+	if !ok {
+		return false, nil
+	}
+
+	return true, set
 }
 
 // collector walks the header c and collects the Str
