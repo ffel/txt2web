@@ -105,8 +105,7 @@ func (s sectiondata) String() string {
 type section struct {
 	sections []sectiondata // the collection of sections
 
-	parsing bool        // true if visited the very first section
-	current sectiondata // convenience value for last member in sections
+	// parsing bool        // true if visited the very first section
 }
 
 func (sec *section) Value(level int, key string, value interface{}) (bool, interface{}) {
@@ -132,13 +131,23 @@ func (sec *section) Value(level int, key string, value interface{}) (bool, inter
 			}
 		}
 
+		// schijnbaar gaat dit niet goed - out-of-range
+		println(len(sec.sections), ok)
+		if ok {
+			//
+			current := sec.sections[len(sec.sections)-1]
+			current.contents = append(current.contents, value)
+			sec.sections[len(sec.sections)-1] = current
+		}
+
 		// if we're dealing with a section, that is, not in the text before
 		// the first section, we can append the value to current contents
-		if sec.parsing {
-			// this is not going to work as you may get a new sec.current.contents
-			// which was never added to the original collection
-			sec.current.contents = append(sec.current.contents, value)
-		}
+		// if sec.parsing {
+		// this is not going to work as you may get a new sec.current.contents
+		// which was never added to the original collection
+
+		// sec.current.contents = append(sec.current.contents, value)
+		// }
 
 		return false, value
 	}
@@ -166,9 +175,13 @@ func (sec *section) nextSection(header interface{}) {
 
 	pandocfilter.Walk(col, title)
 
-	sec.parsing = true
-	sec.current = sectiondata{id: id, title: strings.TrimSpace(col.value)}
-	sec.sections = append(sec.sections, sec.current)
+	// sec.parsing = true
+	// sec.current = sectiondata{id: id, title: strings.TrimSpace(col.value)}
+	sec.sections = append(sec.sections,
+		sectiondata{
+			id:    id,
+			title: strings.TrimSpace(col.value),
+		})
 }
 
 // collector walks the header c and collects the Str
