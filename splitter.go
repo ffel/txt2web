@@ -42,10 +42,13 @@ func wrapSection(in interface{}) interface{} {
 	// use an anonymous struct
 	// see, e.g. https://talks.golang.org/2012/10things.slide#2
 
+	// btw, in earliers solutions, the wrapper was added to the json string
+	// which makes it easier to get the `unMeta` correct (instead of `UnMeta`)
+
 	return []interface{}{
 		struct {
 			UnMeta interface{}
-		}{},
+		}{struct{}{}},
 		in,
 	}
 }
