@@ -7,6 +7,7 @@ package txt2web
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/ffel/pandocfilter"
@@ -25,7 +26,7 @@ func Split(in <-chan Chunk) <-chan Chunk {
 			for i, s := range spl.sections {
 				out <- Chunk{
 					Json:     wrapSection(spl.meta, s.contents),
-					Path:     c.Path,
+					Path:     changePath(c.Path, s.id),
 					Section:  i + 1,
 					Title:    s.title,
 					PandocId: s.id,
@@ -37,6 +38,13 @@ func Split(in <-chan Chunk) <-chan Chunk {
 	}()
 
 	return out
+}
+
+// changePath replaces the file based chunk path for a section based
+// file path
+func changePath(orig, id string) string {
+	dir := filepath.Dir(orig)
+	return filepath.Join(dir, id+".html")
 }
 
 // wrapSection makes piece of json valid pandoc json again

@@ -7,8 +7,8 @@ func ExampleGenerate() {
 	chunkterm(Generate(namegen("filea.txt", "dira/filec.txt")))
 
 	// output:
-	// [filea.txt](#filea.txt/filechunk)
-	// [dira/filec.txt](#dira/filec.txt/filechunk)
+	// [filea.txt](#filechunk)
+	// [dira/filec.txt](#dira/filechunk)
 }
 
 // namegen is a simple generator for Generator testing

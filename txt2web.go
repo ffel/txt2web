@@ -24,9 +24,7 @@ type Chunk struct {
 
 // Webkey is the chunk id that is used to refer between txt files
 func (c Chunk) Webkey() string {
-	// don't use Section in the key for this makes the key change
-	// when the order in the original text file changes, and that's too fragile
-	return fmt.Sprintf("#%s", filepath.Join(c.Path, c.PandocId))
+	return fmt.Sprintf("#%s", filepath.Join(filepath.Dir(c.Path), c.PandocId))
 }
 
 // String produces the markdown link for Chunk
