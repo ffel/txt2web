@@ -1,4 +1,4 @@
-package txt2web
+package pipeline
 
 import (
 	"fmt"
