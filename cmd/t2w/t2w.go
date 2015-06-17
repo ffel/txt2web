@@ -11,7 +11,7 @@ import (
 	"github.com/ffel/txt2web"
 )
 
-// run - go run t2w.go -src=../../example/ -dest=../../example/static
+// run - go run t2w.go -src=../../example/ -dest=../../example_html
 
 // pages subdirectory
 const pages = "pages"
