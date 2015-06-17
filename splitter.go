@@ -57,42 +57,7 @@ func wrapSection(meta, content interface{}) interface{} {
 }
 
 /*
-According to https://github.com/ffel/pandocfilter/blob/master/modify_test.go,
-the following pandoc contents
-
-	Hello
-	=====
-
-	world!
-
-has the following json tree:
-
-	[ { "unMeta" : {  } },
-	  [ { "c" : [ 1,
-	          [ "hello",
-	            [  ],
-	            [  ]
-	          ],
-	          [ { "c" : "Hello",
-	              "t" : "Str"
-	            } ]
-	        ],
-	      "t" : "Header"
-	    },
-	    { "c" : [ { "c" : "world!",
-	            "t" : "Str"
-	          } ],
-	      "t" : "Para"
-	    }
-	  ]
-	]
-
-That is, a two element array with meta data and contents.  The contents
-on its turn is again an array of elements.
-
-Typical headers come in at level 2.  (I can only think of headers in block
-quotes that come in on a higher level.  We can ignore these for now.)
-*/
+ */
 
 type sectiondata struct {
 	title    string
