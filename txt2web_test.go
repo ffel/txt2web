@@ -1,23 +1,43 @@
 package txt2web
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 func Example() {
-	outc := Convert("example", "static")
+	outc := Convert("example/dirb", "static")
+
+	// the order in which results appear in outc is not deterministic
+	// as it depends on the speed the worker pool processes each chunk
+	// thats why we sort the results
+
+	var results []HtmlFile
 
 	for f := range outc {
-		fmt.Printf("%v -- %v\n", f.Path, f.Title)
+		results = append(results, f)
+	}
+
+	sort.Sort(byTitle(results))
+
+	for _, r := range results {
+		fmt.Printf("%v -- %v\n", r.Path, r.Title)
 	}
 
 	// output:
-	// filea.txt -- Lorem ipsum dolor sit amet
-	// filea.txt -- Morbi finibus rutrum condimentum.
-	// fileb.txt -- Pellentesque lobortis lacus
-	// dira/filec.txt -- Nulla euismod placerat nunc at mattis
-	// dira/filec.txt -- Donec lacus leo
-	// dira/filed.txt -- Fusce non aliquet tortor.
-	// dira/filed.txt -- Nulla ut faucibus felis
-	// dirb/filee.txt -- Pellentesque lacinia
-	// dirb/filee.txt -- Vivamus eget cursus erat, in pharetra neque
-	// dirb/filee.txt -- Phasellus lorem eros
+	// filee.txt -- Acht Pellentesque lacinia
+	// filee.txt -- Negen Vivamus eget cursus erat, in pharetra neque
+	// filee.txt -- Tien Phasellus lorem eros
+}
+
+type byTitle []HtmlFile
+
+func (s byTitle) Len() int {
+	return len(s)
+}
+func (s byTitle) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s byTitle) Less(i, j int) bool {
+	return s[i].Title < s[j].Title
 }
