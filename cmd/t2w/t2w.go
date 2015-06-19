@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/ffel/txt2web"
 )
@@ -37,11 +36,8 @@ func main() {
 			continue
 		}
 
-		// swap .txt extension for .html
-		path := strings.TrimSuffix(h.Path, filepath.Ext(h.Path)) + ".html"
-
 		// write file
-		err = ioutil.WriteFile(filepath.Join(dest, pages, path), h.Contents, 0644)
+		err = ioutil.WriteFile(filepath.Join(dest, pages, h.Path), h.Contents, 0644)
 
 		if err != nil {
 			log.Println(err)
