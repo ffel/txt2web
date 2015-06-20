@@ -46,5 +46,5 @@ type HtmlFile struct {
 // Convert does the complete txt2web conversion
 func Convert(txtroot, destination string) <-chan HtmlFile {
 	// this creates the entire pipeline
-	return WriteHtml(Split(Generate(TxtFiles(txtroot, destination))))
+	return WriteHtml(Split(References(Generate(TxtFiles(txtroot, destination)))))
 }
