@@ -51,8 +51,10 @@ This project implements a [pipeline](http://blog.golang.org/pipelines) approach.
 
 2.  `Generate()` reads the `txt` files and generates objects that contain a json representation of the text.
 
-3.  `Split()` splits each such object such that it contains one first level markdown section.
+3.  `Refs()` replaces in-file references for references that work between html files.
 
-4.  `WriteHtml()` converts objects to html.
+4.  `Split()` splits each such object such that it contains one first level markdown section.
+
+5.  `WriteHtml()` converts objects to html.
 
 > github flavoured markdown is obtained with `pandoc readme.md -t markdown_github -o readme.md`.
