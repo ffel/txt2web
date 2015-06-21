@@ -22,16 +22,16 @@ import (
 // id that can be given to a section (this is the ordinary default pandoc
 // id or an overriden id to be used for internal references).
 
+// References wraps two sub processes that together translate references.
+func References(in <-chan Chunk) <-chan Chunk {
+	return ref_translator(ref_finder(in))
+}
+
 // RefChunk wraps Chunk with a ref translation map.  It is the intermeditate
 // between the two subl processes.
 type RefChunk struct {
 	Chunk                          // original chunk
 	Translations map[string]string // internal ref -> external ref
-}
-
-// References wraps two sub processes that together translate references.
-func References(in <-chan Chunk) <-chan Chunk {
-	return ref_translator(ref_finder(in))
 }
 
 func ref_finder(in <-chan Chunk) <-chan RefChunk {
