@@ -41,14 +41,14 @@ func contentGen(content ...string) <-chan Chunk {
 			result := <-resultc
 
 			if err := result.Err; err != nil {
-				log.Fatal(err)
+				log.Fatal("contentGen:", err)
 			}
 
 			var jsondata interface{}
 			err := json.Unmarshal(result.Text, &jsondata)
 
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("contentGen:", err)
 			}
 
 			out <- Chunk{Json: jsondata, Section: i}
@@ -67,7 +67,7 @@ func markdownTerm(in <-chan Chunk) {
 		bytes, err := json.Marshal(c.Json)
 
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("markdownTerm - marshal json:", err)
 		}
 
 		resultc := piperunner.Exec("pandoc -f json -t markdown", bytes)
@@ -75,7 +75,7 @@ func markdownTerm(in <-chan Chunk) {
 		result := <-resultc
 
 		if result.Err != nil {
-			log.Fatal(err)
+			log.Println("markdownTerm: - result:", string(result.Text))
 		}
 
 		fmt.Print(string(result.Text))
@@ -93,7 +93,7 @@ func markdownChan(in <-chan Chunk) <-chan []byte {
 			bytes, err := json.Marshal(c.Json)
 
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("markdownChan:", err)
 			}
 
 			resultc := piperunner.Exec("pandoc -f json -t markdown", bytes)
@@ -101,7 +101,7 @@ func markdownChan(in <-chan Chunk) <-chan []byte {
 			result := <-resultc
 
 			if result.Err != nil {
-				log.Fatal(err)
+				log.Fatal("markdownChan:", err)
 			}
 
 			out <- result.Text

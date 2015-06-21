@@ -2,6 +2,7 @@ package txt2web
 
 import (
 	"log"
+	"strings"
 
 	"github.com/ffel/pandocfilter"
 )
@@ -56,7 +57,13 @@ func ref_translator(in <-chan RefChunk) <-chan Chunk {
 	go func() {
 		for rc := range in {
 
-			out <- rc.Chunk
+			translator := reftranslator{rc.Translations}
+
+			chunk := rc.Chunk
+
+			chunk.Json = pandocfilter.Walk(translator, rc.Chunk.Json)
+
+			out <- chunk
 		}
 		close(out)
 	}()
@@ -97,6 +104,10 @@ references have the following structure:
 
 That is, `t` is "Link" and `c` is a list with two values
 
+There is an additional point of attention for internal links.  You write
+`[see](#link)` and these end up as `<h2 id="link">Section Header</h2>`,
+that is, without the `#`
+
 */
 
 type reffinder struct {
@@ -133,6 +144,38 @@ func (rf *reffinder) Value(level int, key string, value interface{}) (bool, inte
 		rf.refs[ref] = "foobar"
 
 		return false, value
+	}
+
+	return true, value
+}
+
+type reftranslator struct {
+	refs map[string]string
+}
+
+func (rt reftranslator) Value(level int, key string, value interface{}) (bool, interface{}) {
+	ok, t, c := pandocfilter.IsTypeContents(value)
+
+	if ok && t == "Link" {
+		link, err := pandocfilter.GetString(c, "1", "0")
+
+		if err != nil {
+			log.Println(err)
+			return false, value
+		}
+
+		// reference links start with #, target links do not
+		link = strings.TrimPrefix(link, "#")
+
+		println("link:", link)
+
+		if newkey, exists := rt.refs[link]; exists {
+			println("insert new key", newkey)
+
+			// and now, do the actual replacement
+		}
+
+		return true, value
 	}
 
 	return true, value

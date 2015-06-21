@@ -1,17 +1,27 @@
 package txt2web
 
-const hello = `# hello
+// ref before id!!
 
-world!
-`
+var tests = []string{
+	`
+# section 1
+
+# section 2
+
+see [section 1](#section-1)
+	`,
+}
 
 func ExampleReferences() {
-	markdownTerm(contentGen(hello))
+	markdownTerm(References(contentGen(tests...)))
 
 	// output:
-	// hello
-	// =====
+	// section 1
+	// =========
 	//
-	// world!
+	// section 2
+	// =========
+	//
+	// see [section 1](foobar)
 	// ---
 }
