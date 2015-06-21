@@ -170,12 +170,17 @@ func (rt reftranslator) Value(level int, key string, value interface{}) (bool, i
 		println("link:", link)
 
 		if newkey, exists := rt.refs[link]; exists {
-			println("insert new key", newkey)
+			// see https://golang.org/doc/effective_go.html#interface_conversions
+			// see GetString ...  you need a SetString (json, str, ... indices)
 
-			// and now, do the actual replacement
+			// a shortcut throough c assuming I know its structure
+			// this uses type assertion
+			arr := c.([]interface{})
+			arr2 := arr[1].([]interface{})
+			arr2[0] = newkey
 		}
 
-		return true, value
+		return false, value
 	}
 
 	return true, value
