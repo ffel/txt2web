@@ -9,6 +9,12 @@ var tests = []string{
 # section 2
 
 see [section 1](#section-1)
+	`, `
+# section 1
+
+see [section 2](#section-2)
+
+# section 2
 	`,
 }
 
@@ -23,5 +29,13 @@ func ExampleReferences() {
 	// =========
 	//
 	// see [section 1](foobar)
+	// ---
+	// section 1
+	// =========
+	//
+	// see [section 2](foobar)
+	//
+	// section 2
+	// =========
 	// ---
 }
