@@ -2,6 +2,7 @@ package txt2web
 
 import (
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/ffel/pandocfilter"
@@ -22,6 +23,8 @@ import (
 // I'd like to stress, this only affects the `[reference](#link)`, not the
 // id that can be given to a section (this is the ordinary default pandoc
 // id or an overriden id to be used for internal references).
+//
+// external refs are "#/<path>/<pandoc-ref>"
 
 // References wraps two sub processes that together translate references.
 func References(in <-chan Chunk) <-chan Chunk {
@@ -39,7 +42,7 @@ func ref_finder(in <-chan Chunk) <-chan RefChunk {
 	out := make(chan RefChunk)
 	go func() {
 		for c := range in {
-			finder := &reffinder{make(map[string]string)}
+			finder := &reffinder{make(map[string]string), filepath.Dir(c.Path)}
 
 			pandocfilter.Walk(finder, c.Json)
 
@@ -111,7 +114,8 @@ that is, without the `#`
 */
 
 type reffinder struct {
-	refs map[string]string
+	refs   map[string]string
+	prefix string
 }
 
 func (rf *reffinder) Value(level int, key string, value interface{}) (bool, interface{}) {
@@ -141,7 +145,11 @@ func (rf *reffinder) Value(level int, key string, value interface{}) (bool, inte
 			log.Printf("reffinder - duplicate key: %v\n", ref)
 		}
 
-		rf.refs[ref] = "foobar"
+		webkey := "/" + rf.prefix + "/" + ref
+
+		rf.refs[ref] = "#" + webkey
+
+		pandocfilter.SetString(c, webkey, "1", "0")
 
 		return false, value
 	}
@@ -166,8 +174,6 @@ func (rt reftranslator) Value(level int, key string, value interface{}) (bool, i
 
 		// reference links start with #, target links do not
 		link = strings.TrimPrefix(link, "#")
-
-		println("link:", link)
 
 		if newkey, exists := rt.refs[link]; exists {
 			pandocfilter.SetString(c, newkey, "1", "0")

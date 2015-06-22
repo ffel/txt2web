@@ -59,6 +59,22 @@ func contentGen(content ...string) <-chan Chunk {
 	return out
 }
 
+// setFile sets the file name in chunk
+func setFile(in <-chan Chunk, filename string) <-chan Chunk {
+	out := make(chan Chunk)
+
+	go func() {
+		for c := range in {
+			c.Path = filename
+
+			out <- c
+		}
+		close(out)
+	}()
+
+	return out
+}
+
 // markdownTerm does basically the same as WriteHtml, except that is does
 // produce markdown
 func markdownTerm(in <-chan Chunk) {
