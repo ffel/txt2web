@@ -3,7 +3,6 @@ package txt2web
 import (
 	"log"
 	"path/filepath"
-	"strings"
 
 	"github.com/ffel/pandocfilter"
 )
@@ -19,12 +18,6 @@ import (
 // We assume you write ordinary pandoc txt documents with ordinary internal
 // references.  There is only one exception: as soon as you want to refer to
 // a section in a different txt file, you'll have to use the eventual reference.
-//
-// I'd like to stress, this only affects the `[reference](#link)`, not the
-// id that can be given to a section (this is the ordinary default pandoc
-// id or an overriden id to be used for internal references).
-//
-// external refs are "#/<path>/<pandoc-ref>"
 
 // References wraps two sub processes that together translate references.
 func References(in <-chan Chunk) <-chan Chunk {
@@ -42,7 +35,14 @@ func ref_finder(in <-chan Chunk) <-chan RefChunk {
 	out := make(chan RefChunk)
 	go func() {
 		for c := range in {
-			finder := &reffinder{make(map[string]string), filepath.Dir(c.Path)}
+			prefix := filepath.Dir(c.Path)
+			if prefix == "." {
+				prefix = ""
+			} else {
+				prefix = "/" + prefix
+			}
+
+			finder := &reffinder{make(map[string]string), prefix}
 
 			pandocfilter.Walk(finder, c.Json)
 
@@ -134,22 +134,21 @@ func (rf *reffinder) Value(level int, key string, value interface{}) (bool, inte
 			return false, value
 		}
 
-		ref, err := pandocfilter.GetString(c, "1", "0")
+		anchor, err := pandocfilter.GetString(c, "1", "0")
 
 		if err != nil {
 			log.Println(err)
 			return false, value
 		}
 
+		// pandoc anchors have no #, pandoc references do
+		ref := "#" + anchor
+
 		if _, exists := rf.refs[ref]; exists {
 			log.Printf("reffinder - duplicate key: %v\n", ref)
 		}
 
-		webkey := "/" + rf.prefix + "/" + ref
-
-		rf.refs[ref] = "#" + webkey
-
-		pandocfilter.SetString(c, webkey, "1", "0")
+		rf.refs[ref] = "#" + rf.prefix + "/" + anchor
 
 		return false, value
 	}
@@ -172,14 +171,12 @@ func (rt reftranslator) Value(level int, key string, value interface{}) (bool, i
 			return false, value
 		}
 
-		// reference links start with #, target links do not
-		link = strings.TrimPrefix(link, "#")
-
 		if newkey, exists := rt.refs[link]; exists {
 			pandocfilter.SetString(c, newkey, "1", "0")
 		}
 
-		return false, value
+		// links in links exist, so we've to descend into the link
+		return true, value
 	}
 
 	return true, value

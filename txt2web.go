@@ -32,6 +32,10 @@ func (c Chunk) String() string {
 	return fmt.Sprintf("[%s](%s)", c.Title, c.Webkey())
 }
 
+// any chance there are two instances running at the same time?
+// not for now, so no need to store path to web root and target
+// path with every file
+
 // txtRoot is relative or absolute path to root of txt2web project
 var txtRoot string
 var destination string

@@ -26,11 +26,11 @@ func Example() {
 
 	// output:
 	// dirb/acht-pellentesque-lacinia.html -- Acht Pellentesque lacinia
-	// ./drie-pellentesque-lobortis-lacus.html -- Drie Pellentesque lobortis lacus
-	// ./een-lorem-ipsum-dolor-sit-amet.html -- Een Lorem ipsum dolor sit amet
+	// drie-pellentesque-lobortis-lacus.html -- Drie Pellentesque lobortis lacus
+	// een-lorem-ipsum-dolor-sit-amet.html -- Een Lorem ipsum dolor sit amet
 	// dirb/negen-vivamus-eget-cursus-erat-in-pharetra-neque.html -- Negen Vivamus eget cursus erat, in pharetra neque
 	// dirb/tien-phasellus-lorem-eros.html -- Tien Phasellus lorem eros
-	// ./twee-morbi-finibus-rutrum-condimentum..html -- Twee Morbi finibus rutrum condimentum.
+	// twee-morbi-finibus-rutrum-condimentum..html -- Twee Morbi finibus rutrum condimentum.
 	// dira/vier-nulla-euismod-placerat-nunc-at-mattis.html -- Vier Nulla euismod placerat nunc at mattis
 	// dira/vijf-donec-lacus-leo.html -- Vijf Donec lacus leo
 	// dira/zes-fusce-non-aliquet-tortor..html -- Zes Fusce non aliquet tortor.
