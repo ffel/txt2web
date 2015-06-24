@@ -8,4 +8,4 @@ consectetur magna sit amet vehicula. Vivamus sit amet dui eget urna
 vestibulum gravida. Quisque et mauris vehicula, maximus nisi luctus,
 pellentesque dui.
 
-Refer to [two](/#twee).
+Refer to [two](#/twee-morbi-finibus-rutrum-condimentum).

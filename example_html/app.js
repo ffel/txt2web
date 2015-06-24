@@ -9,52 +9,52 @@ myApp.config(function ($routeProvider) {
         controller: 'mctrl'
     })
     
-    .when('/een', {
+    .when('/een-lorem-ipsum-dolor-sit-amet', {
         templateUrl: 'pages/een-lorem-ipsum-dolor-sit-amet.html',
         controller: 'mctrl'
     })
     
-    .when('/twee', {
+    .when('/twee-morbi-finibus-rutrum-condimentum', {
         templateUrl: 'pages/twee-morbi-finibus-rutrum-condimentum..html',
         controller: 'mctrl'
     })
 
-    .when('/drie', {
+    .when('/drie-pellentesque-lobortis-lacus', {
         templateUrl: 'pages/drie-pellentesque-lobortis-lacus.html',
         controller: 'mctrl'
     })
 
-    .when('/vier', {
+    .when('/dira/vier-nulla-euismod-placerat-nunc-at-mattis', {
         templateUrl: 'pages/dira/vier-nulla-euismod-placerat-nunc-at-mattis.html',
         controller: 'mctrl'
     })
 
-    .when('/vijf', {
+    .when('/dira/vijf-donec-lacus-leo', {
         templateUrl: 'pages/dira/vijf-donec-lacus-leo.html',
         controller: 'mctrl'
     })
 
-    .when('/zes', {
+    .when('/dira/zes-fusce-non-aliquet-tortor', {
         templateUrl: 'pages/dira/zes-fusce-non-aliquet-tortor..html',
         controller: 'mctrl'
     })
     
-    .when('/zeven', {
+    .when('/dira/zeven-nulla-ut-faucibus-felis', {
         templateUrl: 'pages/dira/zeven-nulla-ut-faucibus-felis.html',
         controller: 'mctrl'
     })
     
-    .when('/acht', {
+    .when('/dirb/acht-pellentesque-lacinia', {
         templateUrl: 'pages/dirb/acht-pellentesque-lacinia.html',
         controller: 'mctrl'
     })
     
-    .when('/negen', {
+    .when('/dirb/negen-vivamus-eget-cursus-erat-in-pharetra-neque', {
         templateUrl: 'pages/dirb/negen-vivamus-eget-cursus-erat-in-pharetra-neque.html',
         controller: 'mctrl'
     })
     
-    .when('/tien', {
+    .when('/dirb/tien-phasellus-lorem-eros', {
         templateUrl: 'pages/dirb/tien-phasellus-lorem-eros.html',
         controller: 'mctrl'
     })
