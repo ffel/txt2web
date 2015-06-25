@@ -3,7 +3,6 @@ package txt2web
 import (
 	"fmt"
 	"path/filepath"
-	"sync"
 
 	"github.com/ffel/piperunner"
 )
@@ -18,33 +17,11 @@ func Convert(txtroot, destination string) <-chan HtmlFile {
 
 	var chunkc <-chan Chunk
 
-	// read entire files in chunks
-	chunkc = Generate(filenamec)
-	// replace anchors for angular routes
-	chunkc = References(chunkc)
-	// split chunks into one section per chunk
-	chunkc = Split(chunkc)
+	// read, replace anchors, and split into one main section per chunk
+	chunkc = Split(References(Generate(filenamec)))
 
-	// the result of split is needed in two nodes
-	var root chan Chunk = make(chan Chunk)
-	var pages chan Chunk = make(chan Chunk)
-
-	// this is not really a fan-out, chunks are not distributed, chunks are
-	// duplicated
-	go func(in <-chan Chunk) {
-		for c := range in {
-			root <- c
-			pages <- c
-		}
-		close(root)
-		close(pages)
-	}(chunkc)
-
-	var htmlc <-chan HtmlFile
-
-	htmlc = MergeHtmlFileCh(WriteRoot(root), WriteHtml(pages))
-
-	return htmlc
+	// duplicate chunkc over WriteRoot and WriteHtml and merge the results
+	return MergeH2H(MultiplexC2H(chunkc, WriteRoot, WriteHtml)...)
 }
 
 // Chunk is the basis data object for one #-section
@@ -79,34 +56,6 @@ type HtmlFile struct {
 	Contents []byte
 	Title    string
 	Path     string
-}
-
-// MergeHtmlFileCh takes several channels and combine their input
-// taken from http://blog.golang.org/pipelines, fan-in, fan-out
-func MergeHtmlFileCh(cs ...<-chan HtmlFile) <-chan HtmlFile {
-	var wg sync.WaitGroup
-	out := make(chan HtmlFile)
-
-	// Start an output goroutine for each input channel in cs.  output
-	// copies values from c to out until c is closed, then calls wg.Done.
-	output := func(c <-chan HtmlFile) {
-		for n := range c {
-			out <- n
-		}
-		wg.Done()
-	}
-	wg.Add(len(cs))
-	for _, c := range cs {
-		go output(c)
-	}
-
-	// Start a goroutine to close out once all the output goroutines are
-	// done.  This must start after the wg.Add call.
-	go func() {
-		wg.Wait()
-		close(out)
-	}()
-	return out
 }
 
 // init starts the pool of pipe runners which is the worker pool of
