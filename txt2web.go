@@ -35,12 +35,12 @@ type Chunk struct {
 
 // Webkey is the chunk id that is used to refer between txt files
 func (c Chunk) Webkey() string {
-	return fmt.Sprintf("#%s", filepath.Join(filepath.Dir(c.Path), c.PandocId))
+	return fmt.Sprintf("%s", filepath.Join(filepath.Dir(c.Path), c.PandocId))
 }
 
 // String produces the markdown link for Chunk
 func (c Chunk) String() string {
-	return fmt.Sprintf("[%s](%s)", c.Title, c.Webkey())
+	return fmt.Sprintf("[%s](#%s)", c.Title, c.Webkey())
 }
 
 // any chance there are two instances running at the same time?
