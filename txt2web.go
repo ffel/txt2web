@@ -49,7 +49,25 @@ type HtmlFile struct {
 
 // Convert does the complete txt2web conversion
 func Convert(txtroot, destination string) <-chan HtmlFile {
-	// this creates the entire pipeline
-	return WriteHtml(Split(References(Generate(TxtFiles(txtroot, destination)))))
-	// return WriteHtml(Split(Generate(TxtFiles(txtroot, destination))))
+
+	var filenamec <-chan string
+
+	// find file names, ignore possible clashes if destination is a sub map
+	filenamec = TxtFiles(txtroot, destination)
+
+	var chunkc <-chan Chunk
+
+	// read entire files in chunks
+	chunkc = Generate(filenamec)
+	// replace anchors for angular routes
+	chunkc = References(chunkc)
+	// split chunks into one section per chunk
+	chunkc = Split(chunkc)
+
+	var htmlc <-chan HtmlFile
+
+	// send file name and contents
+	htmlc = WriteHtml(chunkc)
+
+	return htmlc
 }
