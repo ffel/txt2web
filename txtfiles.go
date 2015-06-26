@@ -9,10 +9,6 @@ import (
 	"path/filepath"
 )
 
-// any chance there are two instances running at the same time?
-// not for now, so no need to store path to web root and target
-// path with every file
-
 // TxtFiles starts processing text files
 // destination is used to make sure TxtFiles ignores destination
 // in case it is a subdirectory of root.

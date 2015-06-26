@@ -7,10 +7,21 @@ import (
 	"github.com/ffel/piperunner"
 )
 
-// init starts the pool of pipe runners which is the worker pool of
-// pandoc processes
-func init() {
-	piperunner.StartPool()
+// Convert does the complete txt2web conversion
+func Convert(txtroot, destination string) <-chan HtmlFile {
+
+	var filenamec <-chan string
+
+	// find file names, ignore possible clashes if destination is a sub map
+	filenamec = TxtFiles(txtroot, destination)
+
+	var chunkc <-chan Chunk
+
+	// read, replace anchors, and split into one main section per chunk
+	chunkc = Split(References(Generate(filenamec)))
+
+	// duplicate chunkc over WriteRoot and WriteHtml and merge the results
+	return MergeH2H(MultiplexC2H(chunkc, WriteRoot, WriteHtml)...)
 }
 
 // Chunk is the basis data object for one #-section
@@ -24,13 +35,17 @@ type Chunk struct {
 
 // Webkey is the chunk id that is used to refer between txt files
 func (c Chunk) Webkey() string {
-	return fmt.Sprintf("#%s", filepath.Join(filepath.Dir(c.Path), c.PandocId))
+	return fmt.Sprintf("%s", filepath.Join(filepath.Dir(c.Path), c.PandocId))
 }
 
 // String produces the markdown link for Chunk
 func (c Chunk) String() string {
-	return fmt.Sprintf("[%s](%s)", c.Title, c.Webkey())
+	return fmt.Sprintf("[%s](#%s)", c.Title, c.Webkey())
 }
+
+// any chance there are two instances running at the same time?
+// not for now, so no need to store path to web root and target
+// path with every file
 
 // txtRoot is relative or absolute path to root of txt2web project
 var txtRoot string
@@ -43,8 +58,8 @@ type HtmlFile struct {
 	Path     string
 }
 
-// Convert does the complete txt2web conversion
-func Convert(txtroot, destination string) <-chan HtmlFile {
-	// this creates the entire pipeline
-	return WriteHtml(Split(Generate(TxtFiles(txtroot, destination))))
+// init starts the pool of pipe runners which is the worker pool of
+// pandoc processes
+func init() {
+	piperunner.StartPool()
 }

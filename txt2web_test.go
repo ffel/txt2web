@@ -35,6 +35,9 @@ func Example() {
 	// dira/vijf-donec-lacus-leo.html -- Vijf Donec lacus leo
 	// dira/zes-fusce-non-aliquet-tortor..html -- Zes Fusce non aliquet tortor.
 	// dira/zeven-nulla-ut-faucibus-felis.html -- Zeven Nulla ut faucibus felis
+	// ../app.js -- angular app
+	// ../index.html -- index
+	// ../pandoc.css -- styles
 }
 
 type byTitle []HtmlFile
