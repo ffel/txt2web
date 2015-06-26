@@ -6,7 +6,8 @@ vulputate tortor vulputate. Integer a risus interdum, ornare magna
 pulvinar, molestie neque. Quisque risus tortor, pretium eu convallis
 eget, mattis vel tortor.
 
-See [twee](#/twee-morbi-finibus-rutrum-condimentum)
+See [twee](#twee-morbi-finibus-rutrum-condimentum.). (This link is in
+`filea.txt` an ordinary internal pandoc reference).
 
 Twee Morbi finibus rutrum condimentum.
 ======================================
@@ -15,5 +16,6 @@ Duis posuere libero vitae auctor rhoncus. Donec eleifend malesuada
 ligula, vel condimentum ipsum tincidunt a. Nam eget ante eget tellus
 rhoncus auctor eu eu augue.
 
-Refer to [three](#/drie-pellentesque-lobortis-lacus).
-
+Refer to [three](#/drie-pellentesque-lobortis-lacus). (This link is in
+`filea.txt` an angular route which is typically used to link between
+`txt` files.)
