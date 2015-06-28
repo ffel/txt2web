@@ -3,6 +3,7 @@ package txt2web
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/ffel/pandocfilter"
 )
@@ -24,7 +25,19 @@ func Toc(in <-chan Chunk) <-chan Chunk {
 
 			t := &toc{}
 
+			fmt.Printf("%v:\n", c.Path)
+
 			pandocfilter.Walk(t, c.Json)
+
+			for _, tocline := range t.sections {
+				line := fmt.Sprintf("%s- %v", strings.Repeat("  ", tocline.level-1), tocline)
+
+				if tocline.level == 1 {
+					fmt.Printf("%80s\n%s\n", "#"+Webkey(c.Path, tocline.anchor), line)
+				} else {
+					fmt.Println(line)
+				}
+			}
 
 			out <- c
 		}
@@ -34,10 +47,19 @@ func Toc(in <-chan Chunk) <-chan Chunk {
 	return out
 }
 
-// splitter splits one chunk into sections
+type tocEntry struct {
+	level  int    // section level
+	title  string // title
+	anchor string // pandoc reference
+	web    string // inter-page web reference
+}
+
+func (t tocEntry) String() string {
+	return fmt.Sprintf("[%s](#%s)", t.title, t.anchor)
+}
+
 type toc struct {
-	// sections []sectiondata // the collection of sections in a file
-	// meta     interface{}   // file meta data
+	sections []tocEntry
 }
 
 func (toc *toc) Value(level int, key string, value interface{}) (bool, interface{}) {
@@ -74,7 +96,11 @@ func (toc *toc) Value(level int, key string, value interface{}) (bool, interface
 
 			pandocfilter.Walk(col, title)
 
-			fmt.Println("toc", secLevel, id, col.value)
+			toc.sections = append(toc.sections, tocEntry{
+				level:  int(secLevel),
+				title:  strings.TrimSpace(col.value),
+				anchor: id,
+			})
 		}
 
 		return false, value
