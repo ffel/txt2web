@@ -26,18 +26,16 @@ func Toc(in <-chan Chunk, writer io.Writer) <-chan Chunk {
 
 			t := &toc{}
 
-			fmt.Printf("%v:\n", c.Path)
+			fmt.Fprintf(writer, "# `%v`\n\n", c.Path)
 
 			pandocfilter.Walk(t, c.Json)
 
 			for _, tocline := range t.sections {
-				line := fmt.Sprintf("%s- %v", strings.Repeat("  ", tocline.level-1), tocline)
-
 				if tocline.level == 1 {
-					fmt.Fprintf(writer, "%80s\n%s\n", "#"+Webkey(c.Path, tocline.anchor), line)
-				} else {
-					fmt.Fprintln(writer, line)
+					fmt.Fprintf(writer, "## [%s](%s)\n\n", tocline.title, "#"+Webkey(c.Path, tocline.anchor))
 				}
+
+				fmt.Fprintf(writer, "%s- %v\n\n", strings.Repeat("  ", tocline.level-1), tocline)
 			}
 
 			out <- c
@@ -52,7 +50,6 @@ type tocEntry struct {
 	level  int    // section level
 	title  string // title
 	anchor string // pandoc reference
-	web    string // inter-page web reference
 }
 
 func (t tocEntry) String() string {
