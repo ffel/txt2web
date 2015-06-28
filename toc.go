@@ -2,6 +2,7 @@ package txt2web
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"strings"
 
@@ -17,7 +18,7 @@ import (
 // a channel.
 
 // Toc creates a table of contents
-func Toc(in <-chan Chunk) <-chan Chunk {
+func Toc(in <-chan Chunk, writer io.Writer) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
@@ -33,9 +34,9 @@ func Toc(in <-chan Chunk) <-chan Chunk {
 				line := fmt.Sprintf("%s- %v", strings.Repeat("  ", tocline.level-1), tocline)
 
 				if tocline.level == 1 {
-					fmt.Printf("%80s\n%s\n", "#"+Webkey(c.Path, tocline.anchor), line)
+					fmt.Fprintf(writer, "%80s\n%s\n", "#"+Webkey(c.Path, tocline.anchor), line)
 				} else {
-					fmt.Println(line)
+					fmt.Fprintln(writer, line)
 				}
 			}
 

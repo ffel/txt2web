@@ -1,8 +1,10 @@
 package txt2web
 
+import "os"
+
 func ExampleToc() {
 	txtRoot = "example"
-	out := Toc(Generate(namegen("dirb/filee.txt")))
+	out := Toc(Generate(namegen("dirb/filee.txt")), os.Stdout)
 
 	for o := range out {
 		_ = o
