@@ -55,6 +55,15 @@ However, internal links to first order sections in one `txt` file that
 will end up in several `html` files will be dealt with as these will be
 replaced for angular routes.
 
+Commands
+--------
+
+`t2w` is the main command and takes a tree of `txt` files and writes a
+tree of `html` files.
+
+`t2toc` is a utility command that prints a table of contents. The links
+can be used in your `txt` files.
+
 Technical Background
 --------------------
 
@@ -78,5 +87,6 @@ chains the following nodes:
 6.  `WriteRoot()` adds the web site root contents (`index.html`,
     `app.js`, styles).
 
-> github flavoured markdown is obtained with
-> `pandoc readme.md -t markdown_github -o readme.md`.
+Additional nodes not used in the default `t2w`:
+
+1.  `Toc()` collects table of contents information.
