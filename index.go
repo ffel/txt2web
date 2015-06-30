@@ -9,6 +9,11 @@ func Index(in <-chan Chunk) <-chan Chunk {
 
 	go func() {
 		for c := range in {
+
+			// expect several file chunks with several sections per directory
+
+			// identify subdirs first
+
 			out <- c
 		}
 		close(out)
@@ -16,3 +21,5 @@ func Index(in <-chan Chunk) <-chan Chunk {
 
 	return out
 }
+
+// we will use type tocEntry to collect sections in one file
