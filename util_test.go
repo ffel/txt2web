@@ -60,12 +60,18 @@ func contentGen(content ...string) <-chan Chunk {
 }
 
 // setFile sets the file name in chunk
-func setFile(in <-chan Chunk, filename string) <-chan Chunk {
+func setFiles(in <-chan Chunk, filenames ...string) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
+		i := 0
 		for c := range in {
-			c.Path = filename
+			if i < len(filenames) {
+				c.Path = filenames[i]
+			} else if len(filenames) > 0 {
+				c.Path = filenames[len(filenames)-1]
+			}
+			i++
 
 			out <- c
 		}

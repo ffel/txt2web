@@ -74,7 +74,7 @@ func TestReferences(t *testing.T) {
 	}
 
 	for _, tt := range inout {
-		c := markdownChan(References(setFile(contentGen(tt.in), "path/file.txt")))
+		c := markdownChan(References(setFiles(contentGen(tt.in), "path/file.txt")))
 
 		got := string(<-c)
 
