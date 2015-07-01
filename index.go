@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/ffel/pandocfilter"
 )
 
 // Index is the node that analyzes chunks for syblings and childs and will
@@ -11,22 +13,22 @@ import (
 
 // indexInfo is a node in a tree
 type indexInfo struct {
-	path string
-	// sections []tocEntry
-	subdirs []*indexInfo
+	dir      string       // dir name (one level of path)
+	sections []tocEntry   // section in current dir
+	subdirs  []*indexInfo // subdirectories, nodes in the tree
 }
 
-func (ii *indexInfo) knowsDir(path string) (bool, *indexInfo) {
-	for _, dir := range ii.subdirs {
-		if dir.path == path {
-			return true, dir
+func (ii *indexInfo) knowsDir(dir string) (bool, *indexInfo) {
+	for _, d := range ii.subdirs {
+		if d.dir == dir {
+			return true, d
 		}
 	}
 	return false, &indexInfo{}
 }
 
 func (ii *indexInfo) String() string {
-	result := ii.path + ": [ "
+	result := fmt.Sprintf("%s (%d): [", ii.dir, len(ii.sections))
 
 	for _, c := range ii.subdirs {
 		result += c.String() + ", "
@@ -40,7 +42,7 @@ func Index(in <-chan Chunk) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
-		root := &indexInfo{path: "."}
+		root := &indexInfo{dir: "."}
 
 		for c := range in {
 
@@ -54,20 +56,26 @@ func Index(in <-chan Chunk) <-chan Chunk {
 
 				elem := strings.Split(path, "/")
 
-				// walk the tree and create nodes where there are no nodes
+				// walk the tree and add sub dirs not yet in the tree
 				for _, dir := range elem {
 
 					if ok, sub := current.knowsDir(dir); ok {
 						current = sub
 					} else {
-						current.subdirs = append(current.subdirs, &indexInfo{path: dir})
+						current.subdirs = append(current.subdirs, &indexInfo{dir: dir})
 						current = current.subdirs[len(current.subdirs)-1]
 					}
 				}
 			}
 
-			fmt.Printf("tree    %v\n", root)
-			fmt.Printf("current %v\n", current)
+			// add section data to current
+			t := &toc{}
+
+			pandocfilter.Walk(t, c.Json)
+
+			current.sections = append(current.sections, t.sections...)
+
+			fmt.Printf("tree: %v\n", root)
 
 			out <- c
 		}
@@ -76,5 +84,3 @@ func Index(in <-chan Chunk) <-chan Chunk {
 
 	return out
 }
-
-// we will use type tocEntry to collect sections in one file
