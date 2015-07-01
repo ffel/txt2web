@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/ffel/pandocfilter"
 )
@@ -75,12 +76,56 @@ func Index(in <-chan Chunk) <-chan Chunk {
 
 			current.sections = append(current.sections, t.sections...)
 
-			fmt.Printf("tree: %v\n", root)
+			// fmt.Printf("tree: %v\n", root)
 
 			out <- c
 		}
+
+		// we need a wait group because pandoc is invoked which makes
+		// the result asynchronous
+		var wg sync.WaitGroup
+		addIndex(out, root, "", wg)
+		wg.Wait()
+
 		close(out)
 	}()
 
 	return out
+}
+
+func addIndex(out <-chan Chunk, node *indexInfo, path string, wg sync.WaitGroup) {
+
+	path = filepath.Join(path, node.dir)
+
+	go func() {
+		// there is a slight chance that this goroutine terminates before
+		// the recursive call is invoked - this could terminate the waitgroup
+		// to soon. I'm not sure that depth first is a solution either ...
+		wg.Add(1)
+
+		fmt.Printf("dir %q has sections:\n", path)
+
+		for _, section := range node.sections {
+			// we have to use the external links, like ordinary author to
+			// refer among files
+			fmt.Printf("%s- [%s](#%s)\n",
+				strings.Repeat("  ", section.level-1),
+				section.title,
+				filepath.Join(path, section.anchor))
+		}
+
+		fmt.Println("and subdirectories:")
+
+		for _, d := range node.subdirs {
+			fmt.Printf("- [directory %q](#%s)\n",
+				d.dir,
+				filepath.Join(path, d.dir))
+		}
+
+		defer wg.Done()
+	}()
+
+	for _, d := range node.subdirs {
+		addIndex(out, d, path, wg)
+	}
 }
