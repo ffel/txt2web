@@ -136,7 +136,7 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 
 		pathelem := strings.Split(path, "/")
 
-		if len(pathelem) > 1 {
+		if path != "." && len(pathelem) >= 1 {
 			header = fmt.Sprintf("[Index](#%v)", filepath.Join(pathelem[:len(pathelem)-1]...))
 		} else {
 			header = "Index"
