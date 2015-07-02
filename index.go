@@ -107,17 +107,21 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 	go func() {
 		defer wg.Done()
 
-		fmt.Printf("dir %q has sections:\n", path)
-
 		sections := ""
 
 		for _, section := range node.sections {
 			// we have to use the external links, like ordinary author to
 			// refer among files
-			sections += fmt.Sprintf("%s- [%s](#%s)\n",
-				strings.Repeat("  ", section.level-1),
-				section.title,
-				filepath.Join(path, section.anchor))
+			if section.level == 1 {
+				sections += fmt.Sprintf("%s-   [%s](#%s)\n",
+					strings.Repeat("    ", section.level-1),
+					section.title,
+					filepath.Join(path, section.anchor))
+			} else {
+				sections += fmt.Sprintf("%s-   %s\n",
+					strings.Repeat("    ", section.level-1),
+					section.title)
+			}
 		}
 
 		directories := ""
@@ -128,6 +132,16 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 				filepath.Join(path, d.dir))
 		}
 
+		header := ""
+
+		pathelem := strings.Split(path, "/")
+
+		if len(pathelem) > 1 {
+			header = fmt.Sprintf("[Index](#%v)", filepath.Join(pathelem[:len(pathelem)-1]...))
+		} else {
+			header = "Index"
+		}
+
 		t := template.New("index")
 		t, err := t.Parse(indexTxt)
 		if err != nil {
@@ -136,12 +150,10 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 
 		buff := bytes.NewBufferString("")
 
-		err = t.Execute(buff, struct{ Sections, Directories string }{sections, directories})
+		err = t.Execute(buff, struct{ Index, Sections, Directories string }{header, sections, directories})
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		// fmt.Println(buff.String())
 
 		resultc := piperunner.Exec("pandoc -f markdown -t json", buff.Bytes())
 
@@ -167,17 +179,15 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 	}
 }
 
+// pandoc reformats this markdown, so the final result is different
 const indexTxt = `
-Index
-=====
+# {{.Index}}
 
-Sections
---------
+## Sections
 
 {{.Sections}}
 
-Directories
------------
+## Directories
 
 {{.Directories}}
 `
