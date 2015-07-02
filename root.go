@@ -191,6 +191,12 @@ var myApp = angular.module('myApp', ['ngRoute']);
 myApp.config(function ($routeProvider) {
     
     $routeProvider
+
+    .when('/', {
+        templateUrl: 'pages/index.html',
+        controller: 'mctrl'
+    })
+    
     {{with .Routes}}
     {{range .}}
 	.when('/{{.Key}}', {

@@ -127,7 +127,7 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 		directories := ""
 
 		for _, d := range node.subdirs {
-			directories += fmt.Sprintf("- [directory %q](#%s)\n",
+			directories += fmt.Sprintf("- [directory %q](#%s/index)\n",
 				d.dir,
 				filepath.Join(path, d.dir))
 		}
@@ -170,7 +170,7 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 			log.Fatal(err)
 		}
 
-		out <- Chunk{Json: jsondata, Path: filepath.Join(path, "index.txt")}
+		out <- Chunk{Json: jsondata, Path: filepath.Join(path, "index.txt"), PandocId: ""}
 
 	}()
 
