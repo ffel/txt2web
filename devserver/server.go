@@ -31,11 +31,13 @@ func main() {
 		var err error
 		switch runtime.GOOS {
 		case "linux":
+			// untested
 			err = exec.Command("xdg-open", url).Start()
 		case "darwin":
 			err = exec.Command("open", url).Start()
 		case "windows":
-			exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+			// untested
+			exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
 		default:
 			err = fmt.Errorf("unsupported platform")
 		}

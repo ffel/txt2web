@@ -64,6 +64,9 @@ tree of `html` files.
 `t2toc` is a utility command that prints a table of contents. The links
 can be used in your `txt` files.
 
+> `devserver/server` is a simple file server to test the contents in
+> `example_html`
+
 Technical Background
 --------------------
 
@@ -93,4 +96,4 @@ chains the following nodes:
 
 Additional nodes not used in the default `t2w`:
 
-1.  `Toc()` collects table of contents information.
+1.  `Toc()` collects table of contents information (used in `t2toc`)
