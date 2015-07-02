@@ -105,9 +105,13 @@ func (spl *splitter) Value(level int, key string, value interface{}) (bool, inte
 		}
 
 		if ok {
-			current := spl.sections[len(spl.sections)-1]
-			current.contents = append(current.contents, value)
-			spl.sections[len(spl.sections)-1] = current
+			if len(spl.sections) > 0 {
+				current := spl.sections[len(spl.sections)-1]
+				current.contents = append(current.contents, value)
+				spl.sections[len(spl.sections)-1] = current
+			} else {
+				log.Println("Ignore contents before the first section.")
+			}
 		}
 
 		return false, value
