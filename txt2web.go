@@ -19,8 +19,7 @@ func Convert(txtroot, destination string) <-chan HtmlFile {
 
 	// read, replace anchors, and split into one main section per chunk
 	// add indeces that will produces index.html
-	// chunkc = Split(References(Index(Generate(filenamec))))
-	chunkc = Split(References(Generate(filenamec)))
+	chunkc = Split(References(Index(Generate(filenamec))))
 
 	// duplicate chunkc over WriteRoot and WriteHtml and merge the results
 	return MergeH2H(MultiplexC2H(chunkc, WriteRoot, WriteHtml)...)
