@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sort"
 
 	"github.com/ffel/piperunner"
 )
@@ -60,12 +61,18 @@ func contentGen(content ...string) <-chan Chunk {
 }
 
 // setFile sets the file name in chunk
-func setFile(in <-chan Chunk, filename string) <-chan Chunk {
+func setFiles(in <-chan Chunk, filenames ...string) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
+		i := 0
 		for c := range in {
-			c.Path = filename
+			if i < len(filenames) {
+				c.Path = filenames[i]
+			} else if len(filenames) > 0 {
+				c.Path = filenames[len(filenames)-1]
+			}
+			i++
 
 			out <- c
 		}
@@ -75,9 +82,10 @@ func setFile(in <-chan Chunk, filename string) <-chan Chunk {
 	return out
 }
 
-// markdownTerm does basically the same as WriteHtml, except that is does
-// produce markdown
-func markdownTerm(in <-chan Chunk) {
+// markdownTerm terminates a pipeline and prints chunks as a sorted list of markdown
+func markdownTerm(in <-chan Chunk, full bool) {
+	var results []markdownFile
+
 	for c := range in {
 
 		bytes, err := json.Marshal(c.Json)
@@ -94,9 +102,37 @@ func markdownTerm(in <-chan Chunk) {
 			log.Println("markdownTerm: - result:", string(result.Text))
 		}
 
-		fmt.Print(string(result.Text))
-		fmt.Println("---")
+		results = append(results, markdownFile{path: c.Path, markdown: string(result.Text)})
 	}
+
+	sort.Sort(markdownByTitle(results))
+
+	for i, f := range results {
+		if full {
+			fmt.Printf("<<%d - %q>>\n%v", i, f.path, f.markdown)
+		} else {
+			fmt.Printf("%d. %q\n", i, f.path)
+		}
+	}
+}
+
+type markdownFile struct {
+	path     string
+	markdown string
+}
+
+type markdownByTitle []markdownFile
+
+func (m markdownByTitle) Len() int {
+	return len(m)
+}
+
+func (m markdownByTitle) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+func (m markdownByTitle) Less(i, j int) bool {
+	return m[i].path < m[j].path
 }
 
 // markdownChan proceduces markdown over a channel

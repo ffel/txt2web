@@ -4,6 +4,12 @@ var myApp = angular.module('myApp', ['ngRoute']);
 myApp.config(function ($routeProvider) {
     
     $routeProvider
+
+    .when('/', {
+        templateUrl: 'pages/index.html',
+        controller: 'mctrl'
+    })
+    
     
     
 	.when('/een-lorem-ipsum-dolor-sit-amet', {
@@ -53,6 +59,21 @@ myApp.config(function ($routeProvider) {
     
 	.when('/dirb/tien-phasellus-lorem-eros', {
 	    templateUrl: 'pages/dirb/tien-phasellus-lorem-eros.html',
+	    controller: 'mctrl'
+	})
+    
+	.when('/index', {
+	    templateUrl: 'pages/index.html',
+	    controller: 'mctrl'
+	})
+    
+	.when('/dira/index', {
+	    templateUrl: 'pages/dira/index.html',
+	    controller: 'mctrl'
+	})
+    
+	.when('/dirb/index', {
+	    templateUrl: 'pages/dirb/index.html',
 	    controller: 'mctrl'
 	})
     

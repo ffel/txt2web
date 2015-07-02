@@ -64,6 +64,9 @@ tree of `html` files.
 `t2toc` is a utility command that prints a table of contents. The links
 can be used in your `txt` files.
 
+> `devserver/server` is a simple file server to test the contents in
+> `example_html`
+
 Technical Background
 --------------------
 
@@ -76,17 +79,21 @@ chains the following nodes:
 2.  `Generate()` reads the `txt` files and generates objects that
     contain a json representation of the text.
 
-3.  `References()` replaces in-file references for references that work
+3.  `Index()` generates `index.txt` and therefore `index.html` in each
+    directory that displays `txt` sections in the current directory as
+    well a list of subdirectories.
+
+4.  `References()` replaces in-file references for references that work
     between html files.
 
-4.  `Split()` splits each such object such that it contains one first
+5.  `Split()` splits each such object such that it contains one first
     level markdown section.
 
-5.  `WriteHtml()` converts chunks to html.
+6.  `WriteHtml()` converts chunks to html.
 
-6.  `WriteRoot()` adds the web site root contents (`index.html`,
+7.  `WriteRoot()` adds the web site root contents (`index.html`,
     `app.js`, styles).
 
 Additional nodes not used in the default `t2w`:
 
-1.  `Toc()` collects table of contents information.
+1.  `Toc()` collects table of contents information (used in `t2toc`)
