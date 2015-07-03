@@ -26,23 +26,30 @@ example
 └── fileb.txt
 ```
 
-is transformed into the following html tree
+is transformed into the following html tree (with an optional `server.go`):
 
 ``` {.tree}
 example_html/
-└── pages
-    ├── dira
-    │   ├── vier-nulla-euismod-placerat-nunc-at-mattis.html
-    │   ├── vijf-donec-lacus-leo.html
-    │   ├── zes-fusce-non-aliquet-tortor..html
-    │   └── zeven-nulla-ut-faucibus-felis.html
-    ├── dirb
-    │   ├── acht-pellentesque-lacinia.html
-    │   ├── negen-vivamus-eget-cursus-erat-in-pharetra-neque.html
-    │   └── tien-phasellus-lorem-eros.html
-    ├── drie-pellentesque-lobortis-lacus.html
-    ├── een-lorem-ipsum-dolor-sit-amet.html
-    └── twee-morbi-finibus-rutrum-condimentum..html
+├── app.js
+├── index.html
+├── pages
+│   ├── dira
+│   │   ├── index.html
+│   │   ├── vier-nulla-euismod-placerat-nunc-at-mattis.html
+│   │   ├── vijf-donec-lacus-leo.html
+│   │   ├── zes-fusce-non-aliquet-tortor..html
+│   │   └── zeven-nulla-ut-faucibus-felis.html
+│   ├── dirb
+│   │   ├── acht-pellentesque-lacinia.html
+│   │   ├── index.html
+│   │   ├── negen-vivamus-eget-cursus-erat-in-pharetra-neque.html
+│   │   └── tien-phasellus-lorem-eros.html
+│   ├── drie-pellentesque-lobortis-lacus.html
+│   ├── een-lorem-ipsum-dolor-sit-amet.html
+│   ├── index.html
+│   └── twee-morbi-finibus-rutrum-condimentum..html
+├── pandoc.css
+└── server.go
 ```
 
 Pandoc has *no* means to deal with links between local files. You have
@@ -63,9 +70,6 @@ tree of `html` files.
 
 `t2toc` is a utility command that prints a table of contents. The links
 can be used in your `txt` files.
-
-> `devserver/server` is a simple file server to test the contents in
-> `example_html`
 
 Technical Background
 --------------------
