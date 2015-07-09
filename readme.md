@@ -79,6 +79,9 @@ This library expects [Pandoc](http://pandoc.org/) to be installed. This
 library is only tested on Mac OSX (Calling Pandoc on linux or, more
 likely, windows may fail).
 
+(I presently use pandoc version 1.13.2, at the time of writing version
+1.15.0.4 is just released.)
+
 Technical Background
 --------------------
 
