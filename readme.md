@@ -26,7 +26,8 @@ example
 └── fileb.txt
 ```
 
-is transformed into the following html tree (with an optional `server.go`):
+is transformed into the following html tree (with an optional
+`server.go`):
 
 ``` {.tree}
 example_html/
@@ -70,6 +71,13 @@ tree of `html` files.
 
 `t2toc` is a utility command that prints a table of contents. The links
 can be used in your `txt` files.
+
+Requirements
+------------
+
+This library expects [Pandoc](http://pandoc.org/) to be installed. This
+library is only tested on Mac OSX (Calling Pandoc on linux or, more
+likely, windows may fail).
 
 Technical Background
 --------------------
