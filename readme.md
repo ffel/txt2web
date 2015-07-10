@@ -97,19 +97,22 @@ chains the following nodes:
 2.  `Generate()` reads the `txt` files and generates objects that
     contain a json representation of the text.
 
-3.  `Index()` generates `index.txt` and therefore `index.html` in each
+3.  `Images()` finds references to local images and copies these to the
+    target directory.
+
+4.  `Index()` generates `index.txt` and therefore `index.html` in each
     directory that displays `txt` sections in the current directory as
     well a list of subdirectories.
 
-4.  `References()` replaces in-file references for references that work
+5.  `References()` replaces in-file references for references that work
     between html files.
 
-5.  `Split()` splits each such object such that it contains one first
+6.  `Split()` splits each such object such that it contains one first
     level markdown section.
 
-6.  `WriteHtml()` converts chunks to html.
+7.  `WriteHtml()` converts chunks to html.
 
-7.  `WriteRoot()` adds the web site root contents (`index.html`,
+8.  `WriteRoot()` adds the web site root contents (`index.html`,
     `app.js`, styles).
 
 Additional nodes not used in the default `t2w`:
