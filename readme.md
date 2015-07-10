@@ -72,6 +72,9 @@ tree of `html` files.
 `t2toc` is a utility command that prints a table of contents. The links
 can be used in your `txt` files.
 
+`t2tree` is a development utility tool that prints a representation of
+the internal pandoc parse tree of a `txt` file.
+
 Requirements
 ------------
 
