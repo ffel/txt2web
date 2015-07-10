@@ -13,7 +13,11 @@ import (
 // run - go run t2w.go -src=../../example/ -dest=../../example_html -server
 
 // pages subdirectory
-const pages = "pages"
+const (
+	pages           = "pages"
+	dirPermissions  = 0755
+	filePermissions = 0644
+)
 
 func main() {
 	var src string
@@ -26,9 +30,12 @@ func main() {
 	flag.Parse()
 
 	if *serverPtr {
-		err := ioutil.WriteFile(filepath.Join(dest, "server.go"), []byte(server), 0644)
+		if err := os.MkdirAll(dest, dirPermissions); err != nil {
+			log.Println("Error creating server dir:", err)
+		}
 
-		if err != nil {
+		if err := ioutil.WriteFile(filepath.Join(dest, "server.go"),
+			[]byte(server), filePermissions); err != nil {
 			log.Println("Error writing server:", err)
 		}
 	}
@@ -38,7 +45,7 @@ func main() {
 	for h := range htmlc {
 
 		// create deep directory
-		err := os.MkdirAll(filepath.Join(dest, pages, filepath.Dir(h.Path)), 0755)
+		err := os.MkdirAll(filepath.Join(dest, pages, filepath.Dir(h.Path)), dirPermissions)
 
 		if err != nil {
 			log.Println(err)
