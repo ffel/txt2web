@@ -7,6 +7,7 @@ func ExampleSplit() {
 	// output:
 	// [Een Lorem ipsum dolor sit amet](#een-lorem-ipsum-dolor-sit-amet)
 	// [Twee Morbi finibus rutrum condimentum.](#twee-morbi-finibus-rutrum-condimentum.)
+	// [Images](#images)
 	// [Drie Pellentesque lobortis lacus](#drie-pellentesque-lobortis-lacus)
 	// [Vier Nulla euismod placerat nunc at mattis](#dira/vier-nulla-euismod-placerat-nunc-at-mattis)
 	// [Vijf Donec lacus leo](#dira/vijf-donec-lacus-leo)

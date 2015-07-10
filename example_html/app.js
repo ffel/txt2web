@@ -22,6 +22,11 @@ myApp.config(function ($routeProvider) {
 	    controller: 'mctrl'
 	})
     
+	.when('/images', {
+	    templateUrl: 'pages/images.html',
+	    controller: 'mctrl'
+	})
+    
 	.when('/drie-pellentesque-lobortis-lacus', {
 	    templateUrl: 'pages/drie-pellentesque-lobortis-lacus.html',
 	    controller: 'mctrl'

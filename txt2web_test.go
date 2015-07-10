@@ -39,6 +39,7 @@ func Example() {
 	// dirb/tien-phasellus-lorem-eros.html -- Tien Phasellus lorem eros
 	// drie-pellentesque-lobortis-lacus.html -- Drie Pellentesque lobortis lacus
 	// een-lorem-ipsum-dolor-sit-amet.html -- Een Lorem ipsum dolor sit amet
+	// images.html -- Images
 	// index.html -- Index
 	// twee-morbi-finibus-rutrum-condimentum..html -- Twee Morbi finibus rutrum condimentum.
 }
