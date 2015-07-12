@@ -3,9 +3,14 @@ package txt2web
 import (
 	"fmt"
 	"log"
+	"net/url"
+	"path/filepath"
+	"strings"
 
 	"github.com/ffel/pandocfilter"
 )
+
+const ImagePath = "images/"
 
 // ImageNode analyse chunks for references to local images.  These
 // will be copied into the target directory and the link will be
@@ -30,9 +35,13 @@ func Images(in <-chan Chunk) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
+		chunknr := 0
+
 		for c := range in {
 
-			li := &localImages{}
+			chunknr++
+
+			li := &localImages{chunknr, 0}
 
 			pandocfilter.Walk(li, c.Json)
 
@@ -44,20 +53,31 @@ func Images(in <-chan Chunk) <-chan Chunk {
 	return out
 }
 
-/*
-+ "0": map:
-    + "c": list:
-        + "0": list:
-            + "0" - Str: "image"
-            + "1" - Space
-            + "2" - Str: "description"
-        + "1": list:
-            + "0": value: image.png
-            + "1": value: fig:
-    + "t": value: Image
-*/
-
 type localImages struct {
+	chunknr int // each chunk gets its own number to prevent clashes
+	imgnr   int // each image in a chunk gets its own number
+}
+
+func (img *localImages) rename(path string) string {
+	u, err := url.Parse(path)
+
+	if err != nil {
+		log.Println("image path parse problem", err)
+		return path
+	}
+
+	if u.Host == "" {
+		img.imgnr++
+
+		_, file := filepath.Split(u.Path)
+		ext := filepath.Ext(file)
+		pre := strings.TrimSuffix(file, ext)
+		u.Path = fmt.Sprintf("%s%s_%d_%d%s", ImagePath, pre, img.chunknr, img.imgnr, ext)
+
+		return u.String()
+	}
+
+	return path
 }
 
 func (img *localImages) Value(level int, key string, value interface{}) (bool, interface{}) {
@@ -65,13 +85,14 @@ func (img *localImages) Value(level int, key string, value interface{}) (bool, i
 	ok, t, c := pandocfilter.IsTypeContents(value)
 
 	if ok && t == "Image" {
-		_ = c
 		path, err := pandocfilter.GetString(c, "1", "0")
 
 		if err != nil {
 			log.Println("image error", err)
-		} else {
-			fmt.Printf("found image link: %q\n", path)
+		}
+
+		if err := pandocfilter.SetString(c, img.rename(path), "1", "0"); err != nil {
+			log.Println("image rename error", err)
 		}
 	}
 
