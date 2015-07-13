@@ -58,12 +58,12 @@ type localImages struct {
 	imgnr   int // each image in a chunk gets its own number
 }
 
-func (img *localImages) rename(path string) string {
+func (img *localImages) rename(path string) (string, bool) {
 	u, err := url.Parse(path)
 
 	if err != nil {
 		log.Println("image path parse problem", err)
-		return path
+		return path, false
 	}
 
 	if u.Host == "" {
@@ -74,10 +74,10 @@ func (img *localImages) rename(path string) string {
 		pre := strings.TrimSuffix(file, ext)
 		u.Path = fmt.Sprintf("%s%s_%d_%d%s", ImagePath, pre, img.chunknr, img.imgnr, ext)
 
-		return u.String()
+		return u.String(), true
 	}
 
-	return path
+	return path, false
 }
 
 func (img *localImages) Value(level int, key string, value interface{}) (bool, interface{}) {
@@ -91,8 +91,14 @@ func (img *localImages) Value(level int, key string, value interface{}) (bool, i
 			log.Println("image error", err)
 		}
 
-		if err := pandocfilter.SetString(c, img.rename(path), "1", "0"); err != nil {
+		targetname, local := img.rename(path)
+
+		if err := pandocfilter.SetString(c, targetname, "1", "0"); err != nil {
 			log.Println("image rename error", err)
+		}
+
+		if local {
+			fmt.Printf("copy file %q to %q\n", path, targetname)
 		}
 	}
 
