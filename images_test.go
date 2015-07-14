@@ -37,7 +37,7 @@ func TestImages(t *testing.T) {
 	}
 
 	for _, tt := range inout {
-		c := markdownChan(Images(setFiles(contentGen(tt.in), "path/file.txt")))
+		c := markdownChan(ImagesNode(setFiles(contentGen(tt.in), "path/file.txt"), copyPrint))
 
 		got := string(<-c)
 

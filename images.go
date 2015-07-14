@@ -11,15 +11,16 @@ import (
 	"github.com/ffel/pandocfilter"
 )
 
+// ImagePath places images next to pages in the target directory
 const ImagePath = "images/"
 
 // ImageNode analyse chunks for references to local images.  These
 // will be copied into the target directory and the link will be
 // updated accordingly
 
-// type FuncProcessImage func(wg *sync.WaitGroup)
-
-func Images(in <-chan Chunk) <-chan Chunk {
+// ImagesNode is a pipeline node that finds references to local images,
+// f is invoked to postprocess
+func ImagesNode(in <-chan Chunk, f FuncProcessImage) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
@@ -34,13 +35,7 @@ func Images(in <-chan Chunk) <-chan Chunk {
 
 			pandocfilter.Walk(li, c.Json)
 
-			go func(l *localImages) {
-				defer wg.Done()
-
-				for target, orig := range l.renames {
-					fmt.Printf("- copy %q to %q\n", orig, target)
-				}
-			}(li)
+			go f(li.renames, &wg)
 
 			out <- c
 		}
@@ -52,6 +47,21 @@ func Images(in <-chan Chunk) <-chan Chunk {
 	return out
 }
 
+// FuncProcessImage is the function signature of the local image post processor.
+// This approach makes it easier configure mocking, or to simply copy, or
+// to resize if too big.
+type FuncProcessImage func(targetSource map[string]string, wg *sync.WaitGroup)
+
+// copyPrint is an example FuncProcessImage mock suitable for unit tests
+func copyPrint(targetSource map[string]string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for t, s := range targetSource {
+		fmt.Printf("- copy %q to %q\n", s, t)
+	}
+}
+
+// localImages implements pandocfilter.Filter to find local images
 type localImages struct {
 	chunknr int               // each chunk gets its own number to prevent clashes
 	imgnr   int               // each image in a chunk gets its own number
