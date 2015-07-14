@@ -35,7 +35,10 @@ func ImagesNode(in <-chan Chunk, f FuncProcessImage) <-chan Chunk {
 
 			pandocfilter.Walk(li, c.Json)
 
-			go f(li.renames, &wg)
+			go func(l *localImages) {
+				f(l.renames)
+				wg.Done()
+			}(li)
 
 			out <- c
 		}
@@ -50,15 +53,22 @@ func ImagesNode(in <-chan Chunk, f FuncProcessImage) <-chan Chunk {
 // FuncProcessImage is the function signature of the local image post processor.
 // This approach makes it easier configure mocking, or to simply copy, or
 // to resize if too big.
-type FuncProcessImage func(targetSource map[string]string, wg *sync.WaitGroup)
+type FuncProcessImage func(targetSource map[string]string)
 
 // copyPrint is an example FuncProcessImage mock suitable for unit tests
-func copyPrint(targetSource map[string]string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func copyPrint(targetSource map[string]string) {
 	for t, s := range targetSource {
 		fmt.Printf("- copy %q to %q\n", s, t)
 	}
+}
+
+func copyFiles(targetSource map[string]string) {
+
+	// copying files is notorious difficult ...
+	//
+	// http://stackoverflow.com/questions/21060945
+	// http://stackoverflow.com/questions/1821811
+	// https://gist.github.com/elazarl/5507969
 }
 
 // localImages implements pandocfilter.Filter to find local images
