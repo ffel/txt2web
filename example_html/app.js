@@ -72,13 +72,13 @@ myApp.config(function ($routeProvider) {
 	    controller: 'mctrl'
 	})
     
-	.when('/dira/index', {
-	    templateUrl: 'pages/dira/index.html',
+	.when('/dirb/index', {
+	    templateUrl: 'pages/dirb/index.html',
 	    controller: 'mctrl'
 	})
     
-	.when('/dirb/index', {
-	    templateUrl: 'pages/dirb/index.html',
+	.when('/dira/index', {
+	    templateUrl: 'pages/dira/index.html',
 	    controller: 'mctrl'
 	})
     

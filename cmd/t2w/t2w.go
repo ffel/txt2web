@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,6 +17,7 @@ import (
 // pages subdirectory
 const (
 	pages           = "pages"
+	images          = "images"
 	dirPermissions  = 0755
 	filePermissions = 0644
 )
@@ -40,7 +43,7 @@ func main() {
 		}
 	}
 
-	htmlc := txt2web.Convert(src, dest)
+	htmlc := txt2web.Convert(src, dest, createFuncProcessImage(src, dest))
 
 	for h := range htmlc {
 
@@ -59,6 +62,45 @@ func main() {
 			log.Println(err)
 		}
 	}
+}
+
+func createFuncProcessImage(sourceDir, targetDir string) txt2web.FuncProcessImage {
+
+	return func(targetSource map[string]string) {
+		for t, s := range targetSource {
+
+			srcName := filepath.Join(sourceDir, s)
+			trgName := filepath.Join(targetDir, t)
+
+			fmt.Printf("copy %q to %q\n", srcName, trgName)
+
+			err := os.MkdirAll(filepath.Dir(trgName), dirPermissions)
+			if err != nil {
+				log.Println("t2w image dir - cannot create dir.", err)
+			}
+
+			r, err := os.Open(srcName)
+			if err != nil {
+				log.Println("t2w image files - cannot read image.", err)
+				return
+			}
+			defer r.Close()
+
+			w, err := os.Create(trgName)
+			if err != nil {
+				log.Println("t2w image files - cannot create image.", err)
+				return
+			}
+			defer w.Close()
+
+			_, err = io.Copy(w, r)
+			if err != nil {
+				log.Println("t2w image files - cannot copy image.", err)
+				return
+			}
+		}
+	}
+
 }
 
 const server = `package main

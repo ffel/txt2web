@@ -12,15 +12,15 @@ import (
 )
 
 // ImagePath places images next to pages in the target directory
-const ImagePath = "images/"
+// const ImagePath = "images/"
 
 // ImageNode analyse chunks for references to local images.  These
 // will be copied into the target directory and the link will be
 // updated accordingly
 
 // ImagesNode is a pipeline node that finds references to local images,
-// f is invoked to postprocess
-func ImagesNode(in <-chan Chunk, f FuncProcessImage) <-chan Chunk {
+// f is invoked to postprocess, links will use imageDir
+func ImagesNode(in <-chan Chunk, imageDir string, f FuncProcessImage) <-chan Chunk {
 	out := make(chan Chunk)
 
 	go func() {
@@ -31,7 +31,7 @@ func ImagesNode(in <-chan Chunk, f FuncProcessImage) <-chan Chunk {
 		for c := range in {
 			chunknr++
 			wg.Add(1)
-			li := &localImages{chunknr, 0, make(map[string]string)}
+			li := &localImages{chunknr, 0, imageDir, make(map[string]string)}
 
 			pandocfilter.Walk(li, c.Json)
 
@@ -58,24 +58,20 @@ type FuncProcessImage func(targetSource map[string]string)
 // copyPrint is an example FuncProcessImage mock suitable for unit tests
 func copyPrint(targetSource map[string]string) {
 	for t, s := range targetSource {
-		fmt.Printf("- copy %q to %q\n", s, t)
+		fmt.Printf("# copy %q to %q\n", s, t)
 	}
 }
 
-func copyFiles(targetSource map[string]string) {
-
-	// copying files is notorious difficult ...
-	//
-	// http://stackoverflow.com/questions/21060945
-	// http://stackoverflow.com/questions/1821811
-	// https://gist.github.com/elazarl/5507969
+// copyPrint is an example FuncProcessImage that remains silent
+func copyIgnore(targetSource map[string]string) {
 }
 
 // localImages implements pandocfilter.Filter to find local images
 type localImages struct {
-	chunknr int               // each chunk gets its own number to prevent clashes
-	imgnr   int               // each image in a chunk gets its own number
-	renames map[string]string // target - orig file name map
+	chunknr  int               // each chunk gets its own number to prevent clashes
+	imgnr    int               // each image in a chunk gets its own number
+	imageDir string            // path added to local files
+	renames  map[string]string // target - orig file name map
 }
 
 func (img *localImages) rename(path string) (string, bool) {
@@ -92,7 +88,7 @@ func (img *localImages) rename(path string) (string, bool) {
 		_, file := filepath.Split(u.Path)
 		ext := filepath.Ext(file)
 		pre := strings.TrimSuffix(file, ext)
-		u.Path = fmt.Sprintf("%s%s_%d_%d%s", ImagePath, pre, img.chunknr, img.imgnr, ext)
+		u.Path = fmt.Sprintf("%s/%s_%d_%d%s", img.imageDir, pre, img.chunknr, img.imgnr, ext)
 
 		return u.String(), true
 	}

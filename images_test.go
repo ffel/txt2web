@@ -4,6 +4,7 @@ import "testing"
 
 // ignore 0
 // each test creates a new instance of Images which resets the counter
+// this package does not determine the final target path
 var images_testinputs []string = []string{`
 `, `![](image.png)
 `, `![](images/image_1_1.png)
@@ -37,7 +38,7 @@ func TestImages(t *testing.T) {
 	}
 
 	for _, tt := range inout {
-		c := markdownChan(ImagesNode(setFiles(contentGen(tt.in), "path/file.txt"), copyPrint))
+		c := markdownChan(ImagesNode(setFiles(contentGen(tt.in), "path/file.txt"), "images", copyIgnore))
 
 		got := string(<-c)
 

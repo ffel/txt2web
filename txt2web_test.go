@@ -6,7 +6,7 @@ import (
 )
 
 func Example() {
-	outc := Convert("example", "static")
+	outc := Convert("example", "static", copyPrint)
 
 	// the order in which results appear in outc is not deterministic
 	// as it depends on the speed the worker pool processes each chunk
@@ -25,6 +25,7 @@ func Example() {
 	}
 
 	// output:
+	// # copy "img/door.png" to "images/door_1_1.png"
 	// ../app.js -- angular app
 	// ../index.html -- index
 	// ../pandoc.css -- styles
