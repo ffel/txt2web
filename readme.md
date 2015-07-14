@@ -8,7 +8,7 @@ The objective of this project is to create a web site based upon a
 directory of `txt` files.
 
 This is work in progress! (Have a look at [hugo](http://gohugo.io/) if
-you're looking for a static site generator.)
+you're want to use a static site generator right now.)
 
 It uses [pandoc](http://pandoc.org/) to convert
 [markdown](http://daringfireball.net/projects/markdown/) to html.
@@ -16,22 +16,26 @@ It uses [pandoc](http://pandoc.org/) to convert
 The current state is that the following tree
 
 ``` {.tree}
-example
+example/
 ├── dira
 │   ├── filec.txt
 │   └── filed.txt
 ├── dirb
 │   └── filee.txt
 ├── filea.txt
-└── fileb.txt
+├── fileb.txt
+└── img
+    └── door.png
 ```
 
 is transformed into the following html tree (with an optional
-`server.go`):
+`server.go` and local images copied to `images/`):
 
 ``` {.tree}
 example_html/
 ├── app.js
+├── images
+│   └── door_1_1.png
 ├── index.html
 ├── pages
 │   ├── dira
@@ -47,6 +51,7 @@ example_html/
 │   │   └── tien-phasellus-lorem-eros.html
 │   ├── drie-pellentesque-lobortis-lacus.html
 │   ├── een-lorem-ipsum-dolor-sit-amet.html
+│   ├── images.html
 │   ├── index.html
 │   └── twee-morbi-finibus-rutrum-condimentum..html
 ├── pandoc.css
@@ -97,8 +102,8 @@ chains the following nodes:
 2.  `Generate()` reads the `txt` files and generates objects that
     contain a json representation of the text.
 
-3.  `Images()` finds references to local images and copies these to the
-    target directory.
+3.  `ImagesNode()` finds references to local images and copies these to
+    the target directory.
 
 4.  `Index()` generates `index.txt` and therefore `index.html` in each
     directory that displays `txt` sections in the current directory as
