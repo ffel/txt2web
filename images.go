@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/ffel/pandocfilter"
 )
@@ -16,20 +17,7 @@ const ImagePath = "images/"
 // will be copied into the target directory and the link will be
 // updated accordingly
 
-// Als ik dit testbaar wil, dan zal ik op de een of andere manier er
-// voor moeten zorgen dat het behandelen van een foto niet hard is.
-//
-// Een manier is een extra out-channel met bestandsnamen, een andere
-// manier is een extra functie als argument die wordt geroepen met
-// de informatie als argument
-//
-// Het is nu vooral iets met de bestaande en de nieuwe naam van het
-// plaatje, maar het zou wel heel prettig zijn wanneer je zeker
-// weet of het bestand bestaat. (maar is dat een voorwaarde, ook de
-// verwerkende functie kan een foutmelding geven)
-//
-// Een bijkomend probleem is dat out pas sluit wanneer zeker is
-// dat alle foto's klaar zijn.
+// type FuncProcessImage func(wg *sync.WaitGroup)
 
 func Images(in <-chan Chunk) <-chan Chunk {
 	out := make(chan Chunk)
@@ -37,16 +25,27 @@ func Images(in <-chan Chunk) <-chan Chunk {
 	go func() {
 		chunknr := 0
 
+		var wg sync.WaitGroup
+
 		for c := range in {
-
 			chunknr++
-
-			li := &localImages{chunknr, 0}
+			wg.Add(1)
+			li := &localImages{chunknr, 0, make(map[string]string)}
 
 			pandocfilter.Walk(li, c.Json)
 
+			go func(l *localImages) {
+				defer wg.Done()
+
+				for target, orig := range l.renames {
+					fmt.Printf("- copy %q to %q\n", orig, target)
+				}
+			}(li)
+
 			out <- c
 		}
+
+		wg.Wait()
 		close(out)
 	}()
 
@@ -54,8 +53,9 @@ func Images(in <-chan Chunk) <-chan Chunk {
 }
 
 type localImages struct {
-	chunknr int // each chunk gets its own number to prevent clashes
-	imgnr   int // each image in a chunk gets its own number
+	chunknr int               // each chunk gets its own number to prevent clashes
+	imgnr   int               // each image in a chunk gets its own number
+	renames map[string]string // target - orig file name map
 }
 
 func (img *localImages) rename(path string) (string, bool) {
@@ -98,7 +98,10 @@ func (img *localImages) Value(level int, key string, value interface{}) (bool, i
 		}
 
 		if local {
-			fmt.Printf("copy file %q to %q\n", path, targetname)
+			// targetnames are unique, and we have to assure that
+			// every target will exist, so it is more safe to use
+			// target as the key
+			img.renames[targetname] = path
 		}
 	}
 
