@@ -6,7 +6,7 @@ import (
 )
 
 func Example() {
-	outc := Convert("example", "static")
+	outc := Convert("example", "static", copyPrint)
 
 	// the order in which results appear in outc is not deterministic
 	// as it depends on the speed the worker pool processes each chunk
@@ -25,6 +25,7 @@ func Example() {
 	}
 
 	// output:
+	// # copy "img/door.png" to "images/door_1_1.png"
 	// ../app.js -- angular app
 	// ../index.html -- index
 	// ../pandoc.css -- styles
@@ -39,6 +40,7 @@ func Example() {
 	// dirb/tien-phasellus-lorem-eros.html -- Tien Phasellus lorem eros
 	// drie-pellentesque-lobortis-lacus.html -- Drie Pellentesque lobortis lacus
 	// een-lorem-ipsum-dolor-sit-amet.html -- Een Lorem ipsum dolor sit amet
+	// images.html -- Images
 	// index.html -- Index
 	// twee-morbi-finibus-rutrum-condimentum..html -- Twee Morbi finibus rutrum condimentum.
 }

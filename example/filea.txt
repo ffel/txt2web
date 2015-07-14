@@ -19,3 +19,12 @@ rhoncus auctor eu eu augue.
 Refer to [three](#/drie-pellentesque-lobortis-lacus). (This link is in
 `filea.txt` an angular route which is typically used to link between
 `txt` files.)
+
+Images
+======
+
+Markdown allows for images:
+
+![](img/door.png)
+
+(Image from [little visuals](http://littlevisuals.co/))

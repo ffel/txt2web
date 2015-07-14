@@ -8,7 +8,7 @@ import (
 )
 
 // Convert does the complete txt2web conversion
-func Convert(txtroot, destination string) <-chan HtmlFile {
+func Convert(txtroot, destination string, localImageFunc FuncProcessImage) <-chan HtmlFile {
 
 	var filenamec <-chan string
 
@@ -18,8 +18,8 @@ func Convert(txtroot, destination string) <-chan HtmlFile {
 	var chunkc <-chan Chunk
 
 	// read, replace anchors, and split into one main section per chunk
-	// add indeces that will produces index.html
-	chunkc = Split(References(Index(Generate(filenamec))))
+	// add indices that will produces index.html
+	chunkc = Split(References(Index(ImagesNode(Generate(filenamec), "images", localImageFunc))))
 
 	// duplicate chunkc over WriteRoot and WriteHtml and merge the results
 	return MergeH2H(MultiplexC2H(chunkc, WriteRoot, WriteHtml)...)

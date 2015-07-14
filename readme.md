@@ -8,7 +8,7 @@ The objective of this project is to create a web site based upon a
 directory of `txt` files.
 
 This is work in progress! (Have a look at [hugo](http://gohugo.io/) if
-you're looking for a static site generator.)
+you're want to use a static site generator right now.)
 
 It uses [pandoc](http://pandoc.org/) to convert
 [markdown](http://daringfireball.net/projects/markdown/) to html.
@@ -16,22 +16,26 @@ It uses [pandoc](http://pandoc.org/) to convert
 The current state is that the following tree
 
 ``` {.tree}
-example
+example/
 ├── dira
 │   ├── filec.txt
 │   └── filed.txt
 ├── dirb
 │   └── filee.txt
 ├── filea.txt
-└── fileb.txt
+├── fileb.txt
+└── img
+    └── door.png
 ```
 
 is transformed into the following html tree (with an optional
-`server.go`):
+`server.go` and local images copied to `images/`):
 
 ``` {.tree}
 example_html/
 ├── app.js
+├── images
+│   └── door_1_1.png
 ├── index.html
 ├── pages
 │   ├── dira
@@ -47,6 +51,7 @@ example_html/
 │   │   └── tien-phasellus-lorem-eros.html
 │   ├── drie-pellentesque-lobortis-lacus.html
 │   ├── een-lorem-ipsum-dolor-sit-amet.html
+│   ├── images.html
 │   ├── index.html
 │   └── twee-morbi-finibus-rutrum-condimentum..html
 ├── pandoc.css
@@ -72,12 +77,18 @@ tree of `html` files.
 `t2toc` is a utility command that prints a table of contents. The links
 can be used in your `txt` files.
 
+`t2tree` is a development utility tool that prints a representation of
+the internal pandoc parse tree of a `txt` file.
+
 Requirements
 ------------
 
 This library expects [Pandoc](http://pandoc.org/) to be installed. This
 library is only tested on Mac OSX (Calling Pandoc on linux or, more
 likely, windows may fail).
+
+(I presently use pandoc version 1.13.2, at the time of writing version
+1.15.0.4 is just released.)
 
 Technical Background
 --------------------
@@ -91,19 +102,22 @@ chains the following nodes:
 2.  `Generate()` reads the `txt` files and generates objects that
     contain a json representation of the text.
 
-3.  `Index()` generates `index.txt` and therefore `index.html` in each
+3.  `ImagesNode()` finds references to local images and copies these to
+    the target directory.
+
+4.  `Index()` generates `index.txt` and therefore `index.html` in each
     directory that displays `txt` sections in the current directory as
     well a list of subdirectories.
 
-4.  `References()` replaces in-file references for references that work
+5.  `References()` replaces in-file references for references that work
     between html files.
 
-5.  `Split()` splits each such object such that it contains one first
+6.  `Split()` splits each such object such that it contains one first
     level markdown section.
 
-6.  `WriteHtml()` converts chunks to html.
+7.  `WriteHtml()` converts chunks to html.
 
-7.  `WriteRoot()` adds the web site root contents (`index.html`,
+8.  `WriteRoot()` adds the web site root contents (`index.html`,
     `app.js`, styles).
 
 Additional nodes not used in the default `t2w`:
