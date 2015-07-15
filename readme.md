@@ -112,12 +112,14 @@ chains the following nodes:
 5.  `References()` replaces in-file references for references that work
     between html files.
 
-6.  `Split()` splits each such object such that it contains one first
+6.  `UpLinkNode()` transforms section titles into up links.
+
+7.  `Split()` splits each such object such that it contains one first
     level markdown section.
 
-7.  `WriteHtml()` converts chunks to html.
+8.  `WriteHtml()` converts chunks to html.
 
-8.  `WriteRoot()` adds the web site root contents (`index.html`,
+9.  `WriteRoot()` adds the web site root contents (`index.html`,
     `app.js`, styles).
 
 Additional nodes not used in the default `t2w`:

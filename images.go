@@ -11,9 +11,6 @@ import (
 	"github.com/ffel/pandocfilter"
 )
 
-// ImagePath places images next to pages in the target directory
-// const ImagePath = "images/"
-
 // ImageNode analyse chunks for references to local images.  These
 // will be copied into the target directory and the link will be
 // updated accordingly
