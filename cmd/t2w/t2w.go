@@ -26,6 +26,12 @@ func main() {
 	var src string
 	var dest string
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "\nt2w creates a web site out of a tree of pandoc txt files\n\nusage: t2w [-src=.] [-dest=./static] [-server]\n")
+		flag.PrintDefaults()
+		fmt.Println()
+	}
+
 	flag.StringVar(&src, "src", ".", "source root of txt tree")
 	flag.StringVar(&dest, "dest", "static", "destination root of html tree")
 	serverPtr := flag.Bool("server", false, "add simple file server")
