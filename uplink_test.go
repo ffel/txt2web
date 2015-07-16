@@ -6,11 +6,17 @@ var uplink_tests []string = []string{`
 main
 ====
 
-sub 1
+sub A
 -----
 
-sub 2
+### Sub A.A
+
+sub B
 -----
+
+### Sub B.A
+
+### Sub B.B
 `, `
 boo
 `,
