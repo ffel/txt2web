@@ -17,14 +17,26 @@ sub B
 ### Sub B.A
 
 ### Sub B.B
+
+main II
+=======
 `, `
-boo
+foo
+`, `
+### weird a
+
+# weird b
+
+###### weird c
+`, `
+bar
 `,
 }
 
 func TestUpLinks(t *testing.T) {
 	inout := []struct{ in, out string }{
 		{uplink_tests[0], uplink_tests[1]},
+		{uplink_tests[2], uplink_tests[3]},
 	}
 
 	for _, tt := range inout {

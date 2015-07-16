@@ -55,26 +55,24 @@ func (ul *uplinks) Value(level int, key string, value interface{}) (bool, interf
 				return false, value
 			}
 
-			if len(ul.tocstack) == 0 {
-				fmt.Printf("section %q (%v) will refer to index.html\n", id, secLevel)
-			} else if len(ul.tocstack) >= secLevel-1 {
+			if len(ul.tocstack) > 0 && secLevel > len(ul.tocstack) {
+				fmt.Printf("section %q (%v) will refer to %q\n", id, secLevel,
+					ul.tocstack[len(ul.tocstack)-1])
+			} else if len(ul.tocstack) > secLevel-2 && secLevel-2 >= 0 {
 				fmt.Printf("section %q (%v) will refer to %q\n", id, secLevel,
 					ul.tocstack[secLevel-2])
+			} else {
+				fmt.Printf("section %q (%v) will refer to index.html\n", id, secLevel)
 			}
 
-			// handles nicely ordered contents
+			// len(ul.tocstack) should become equal to secLevel
 
-			if secLevel == len(ul.tocstack)+1 {
-				ul.tocstack = append(ul.tocstack, id)
-			} else if secLevel == len(ul.tocstack) {
-				fmt.Println("**replace last value", id)
-				ul.tocstack[len(ul.tocstack)-1] = id
-			} else if secLevel == len(ul.tocstack)-1 {
-				ul.tocstack = ul.tocstack[:len(ul.tocstack)-1]
-				ul.tocstack[len(ul.tocstack)-1] = id
+			if len(ul.tocstack) < secLevel {
+				ul.tocstack = append(ul.tocstack, make([]string, secLevel-len(ul.tocstack))...)
+			} else if len(ul.tocstack) > secLevel {
+				ul.tocstack = ul.tocstack[:secLevel]
 			}
-
-			fmt.Printf("\t%#v\n", ul.tocstack)
+			ul.tocstack[len(ul.tocstack)-1] = id
 		}
 
 		return false, value
