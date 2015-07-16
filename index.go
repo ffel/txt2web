@@ -132,15 +132,8 @@ func addIndex(out chan Chunk, node *indexInfo, path string, wg *sync.WaitGroup) 
 				filepath.Join(path, d.dir))
 		}
 
-		header := ""
-
-		pathelem := strings.Split(path, "/")
-
-		if path != "." && len(pathelem) >= 1 {
-			header = fmt.Sprintf("[Index](#%v)", filepath.Join(pathelem[:len(pathelem)-1]...))
-		} else {
-			header = "Index"
-		}
+		// UplinkNode will take care of indices
+		header := "Index"
 
 		t := template.New("index")
 		t, err := t.Parse(indexTxt)
