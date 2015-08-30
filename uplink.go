@@ -55,22 +55,32 @@ func (ul *uplinks) Value(level int, key string, value interface{}) (bool, interf
 				return false, value
 			}
 
-			if len(ul.tocstack) > 0 && secLevel > len(ul.tocstack) {
-				fmt.Printf("section %q (%v) will refer to %q\n", id, secLevel,
-					ul.tocstack[len(ul.tocstack)-1])
-			} else if len(ul.tocstack) > secLevel-2 && secLevel-2 >= 0 {
-				fmt.Printf("section %q (%v) will refer to %q\n", id, secLevel,
-					ul.tocstack[secLevel-2])
-			} else {
-				fmt.Printf("section %q (%v) will refer to index.html\n", id, secLevel)
+			// get rid of irrelevant part of the stack
+			if len(ul.tocstack) >= secLevel {
+				ul.tocstack = ul.tocstack[:secLevel-1]
 			}
 
-			// len(ul.tocstack) should become equal to secLevel
+			// get rid of trailing "" elements
+			for {
+				last := len(ul.tocstack) - 1
+				if last >= 0 && ul.tocstack[last] == "" {
+					ul.tocstack = ul.tocstack[:last]
+				} else {
+					break
+				}
+			}
 
+			// determine parent
+			if len(ul.tocstack) == 0 {
+				fmt.Printf("section %q (%v) will refer to index.html\n", id, secLevel)
+			} else {
+				fmt.Printf("section %q (%v) will refer to %q\n", id, secLevel,
+					ul.tocstack[len(ul.tocstack)-1])
+			}
+
+			// push current section (add "" for absent sections)
 			if len(ul.tocstack) < secLevel {
 				ul.tocstack = append(ul.tocstack, make([]string, secLevel-len(ul.tocstack))...)
-			} else if len(ul.tocstack) > secLevel {
-				ul.tocstack = ul.tocstack[:secLevel]
 			}
 			ul.tocstack[len(ul.tocstack)-1] = id
 		}

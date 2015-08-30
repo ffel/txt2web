@@ -28,10 +28,15 @@ foo
 # weird b
 
 ###### weird c
+
+###### weird c2
 `, `
 bar
 `,
 }
+
+// for one test only
+// go test -run TestUpLinks
 
 func TestUpLinks(t *testing.T) {
 	inout := []struct{ in, out string }{
