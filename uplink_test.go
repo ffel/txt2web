@@ -138,9 +138,9 @@ baz
 
 func TestUpLinks(t *testing.T) {
 	inout := []struct{ in, out string }{
-		// {uplink_tests[0], uplink_tests[1]},
-		//       {uplink_tests[2], uplink_tests[3]},
-		{uplink_tests[4], uplink_tests[5]}, // bedoeld om verschil in structuur te vinden
+		{uplink_tests[0], uplink_tests[1]},
+		// {uplink_tests[2], uplink_tests[3]},
+		// {uplink_tests[4], uplink_tests[5]}, // bedoeld om verschil in structuur te vinden
 	}
 
 	for _, tt := range inout {
