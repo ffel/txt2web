@@ -7,6 +7,7 @@ import (
 	"sort"
 
 	"github.com/ffel/piperunner"
+	"github.com/kr/pretty"
 )
 
 // namegen is a simple generator for Generator testing
@@ -82,6 +83,23 @@ func setFiles(in <-chan Chunk, filenames ...string) <-chan Chunk {
 	return out
 }
 
+// structPrint can be included in the chain to pretty print the currect internal data
+func structPrint(in <-chan Chunk, prefix string, on bool) <-chan Chunk {
+	out := make(chan Chunk)
+
+	go func() {
+		for c := range in {
+			if on {
+				fmt.Printf("\n%v\n%# v\n", prefix, pretty.Formatter(c.Json))
+			}
+			out <- c
+		}
+		close(out)
+	}()
+
+	return out
+}
+
 // markdownTerm terminates a pipeline and prints chunks as a sorted list of markdown
 func markdownTerm(in <-chan Chunk, full bool) {
 	var results []markdownFile
@@ -145,7 +163,7 @@ func markdownChan(in <-chan Chunk) <-chan []byte {
 			bytes, err := json.Marshal(c.Json)
 
 			if err != nil {
-				log.Fatal("markdownChan:", err)
+				log.Fatal("markdownChan: ", err)
 			}
 
 			resultc := piperunner.Exec("pandoc -f json -t markdown", bytes)
@@ -153,7 +171,7 @@ func markdownChan(in <-chan Chunk) <-chan []byte {
 			result := <-resultc
 
 			if result.Err != nil {
-				log.Fatal("markdownChan:", err)
+				log.Fatalf("markdownChan: %v\n%# v\n-- pandoc could not convert this json\n", err, pretty.Formatter(c.Json))
 			}
 
 			out <- result.Text
