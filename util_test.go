@@ -100,6 +100,19 @@ func structPrint(in <-chan Chunk, prefix string, on bool) <-chan Chunk {
 	return out
 }
 
+// jsonPrint pretty prints the internal data structure
+func jsonPrint(jsonstring string) string {
+
+	var jsondata interface{}
+	err := json.Unmarshal([]byte(jsonstring), &jsondata)
+
+	if err != nil {
+		log.Fatal("jsonPrint:", err)
+	}
+
+	return fmt.Sprintf("%# v\n", pretty.Formatter(jsondata))
+}
+
 // markdownTerm terminates a pipeline and prints chunks as a sorted list of markdown
 func markdownTerm(in <-chan Chunk, full bool) {
 	var results []markdownFile
