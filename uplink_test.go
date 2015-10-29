@@ -144,7 +144,7 @@ func TestUpLinks(t *testing.T) {
 	}
 
 	for _, tt := range inout {
-		c := markdownChan(UpLinkNode(setFiles(contentGen(tt.in), "file.txt")))
+		c := markdownChan(structPrint(UpLinkNode(setFiles(contentGen(tt.in), "file.txt")), "**", false))
 
 		got := string(<-c)
 
